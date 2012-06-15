@@ -7,9 +7,7 @@
 	</pre>
 
 	<h3>XML</h3>
-	<pre>
-		${xml!"No xml"}
-	</pre>
+	<pre>${xml?html!"No xml"}</pre>
 </div>
 <#include "/layout/debug.ftl">
 <#include "/layout/footer.ftl">

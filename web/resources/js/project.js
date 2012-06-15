@@ -3,18 +3,15 @@ $(function() {
         var $trigger = $(this);
         var $section = $trigger.closest('section');
         var $placeholder = $section.find('.placeholder').first();
-        var $template = $section.find('.template[data-trigger='+ $trigger.attr('rel') +']').first();
-
-        $placeholder.append($template.clone());
-        // TODO Alter input name to not collide
-
+        var $template = $('.template[data-trigger='+ $trigger.attr('rel') +']').first();
+        $placeholder.append($template.html());
+        event.preventDefault();
     });
 
     $('.template-trigger-remove').live('click', function(event) {
         var $trigger = $(this);
-        var $template = $trigger.closest('.template');
-
-        $template.remove();
-
+        var $fieldset = $trigger.closest('fieldset');
+        $fieldset.remove();
+        event.preventDefault();
     });
 });
