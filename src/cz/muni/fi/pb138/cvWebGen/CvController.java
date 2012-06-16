@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value="/cv")
@@ -31,8 +34,6 @@ public class CvController {
         CvManager cvManager = new CvManager();
         CvDocument doc = cvManager.parseFromHtmlFormRequest(request);
         String xml = doc.xmlText((new XmlOptions()).setSavePrettyPrint());
-
-        System.out.println(xml);
 
         model.addAttribute("xml", xml);
 
