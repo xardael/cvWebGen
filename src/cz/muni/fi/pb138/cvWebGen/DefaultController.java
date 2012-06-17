@@ -112,8 +112,14 @@ public class DefaultController {
 
     @RequestMapping(value="/viewer/{hash}/", method=RequestMethod.GET)
     public String viewer(ModelMap model, @PathVariable String hash, HttpServletRequest request) {
-        System.out.println(cvManager.getCvDocumentByHash(hash));
         model.addAttribute("cv", cvManager.getCvDocumentByHash(hash).getCv());
+        return "viewer";
+
+    }
+
+    @RequestMapping(value="/viewer/{hash}/", method=RequestMethod.GET, params="do=export")
+    public String viewerExport(ModelMap model, @PathVariable String hash, HttpServletRequest request) {
+        Latex.generatePdf(hash, cvManager.getCvDocumentByHash(hash).xmlText());
         return "viewer";
 
     }
