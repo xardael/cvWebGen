@@ -1,8 +1,10 @@
 package cz.muni.fi.pb138.cvWebGen;
 
 import cz.muni.fi.pb138.cvWebGen.xml.*;
+import org.apache.xmlbeans.XmlException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,6 +13,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CvManager {
+
+    private BaseXClient baseXClient;
+
+    public CvManager() {
+        try {
+            baseXClient = new BaseXClient("localhost", 1984, "admin", "admin");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public CvDocument parseFromHtmlFormRequest(HttpServletRequest request) {
 
@@ -128,14 +140,16 @@ public class CvManager {
         /*********/
         CvDocument.Cv.Works works = cv.addNewWorks();
         /* Items */
-        String[] worksPivot = request.getParameterValues("work-employer");
-        for (int i = 0; i < worksPivot.length; i++) {
-            WorkType newWork = works.addNewWork();
-            newWork.setPeriod(this._parsePeriod(request, "work", i));
-            newWork.setEmployer(request.getParameterValues("work-employer")[i]);
-            newWork.setPosition(request.getParameterValues("work-position")[i]);
-            newWork.setActivities(request.getParameterValues("work-activities")[i]);
-            newWork.setSector(request.getParameterValues("work-sector")[i]);
+        if (request.getParameterValues("work-employer") != null) {
+            String[] worksPivot = request.getParameterValues("work-employer");
+            for (int i = 0; i < worksPivot.length; i++) {
+                WorkType newWork = works.addNewWork();
+                newWork.setPeriod(this._parsePeriod(request, "work", i));
+                newWork.setEmployer(request.getParameterValues("work-employer")[i]);
+                newWork.setPosition(request.getParameterValues("work-position")[i]);
+                newWork.setActivities(request.getParameterValues("work-activities")[i]);
+                newWork.setSector(request.getParameterValues("work-sector")[i]);
+            }
         }
 
 
@@ -143,23 +157,27 @@ public class CvManager {
         /**************/
         CvDocument.Cv.Educations educations = cv.addNewEducations();
         /* Items */
-        String[] educationsPivot = request.getParameterValues("education-organisation");
-        for (int i = 0; i < educationsPivot.length; i++) {
-            EducationType newEducation = educations.addNewEducation();
-            newEducation.setPeriod(this._parsePeriod(request, "education", i));
-            newEducation.setOrganisation(request.getParameterValues("education-organisation")[i]);
-            newEducation.setDescription(request.getParameterValues("education-description")[i]);
+        if (request.getParameterValues("education-organisation") != null) {
+            String[] educationsPivot = request.getParameterValues("education-organisation");
+            for (int i = 0; i < educationsPivot.length; i++) {
+                EducationType newEducation = educations.addNewEducation();
+                newEducation.setPeriod(this._parsePeriod(request, "education", i));
+                newEducation.setOrganisation(request.getParameterValues("education-organisation")[i]);
+                newEducation.setDescription(request.getParameterValues("education-description")[i]);
+            }
         }
 
         /* Skills */
         /**********/
         CvDocument.Cv.Skills skills= cv.addNewSkills();
         /* Items */
-        String[] skillsPivot = request.getParameterValues("skill-name");
-        for (int i = 0; i < skillsPivot.length; i++) {
-            SkillType newSkill = skills.addNewSkill();
-            newSkill.setName(request.getParameterValues("skill-name")[i]);
-            newSkill.setStringValue(request.getParameterValues("skill-content")[i]);
+        if (request.getParameterValues("skill-name") != null) {
+            String[] skillsPivot = request.getParameterValues("skill-name");
+            for (int i = 0; i < skillsPivot.length; i++) {
+                SkillType newSkill = skills.addNewSkill();
+                newSkill.setName(request.getParameterValues("skill-name")[i]);
+                newSkill.setStringValue(request.getParameterValues("skill-content")[i]);
+            }
         }
 
 
@@ -167,25 +185,26 @@ public class CvManager {
         /*************/
         CvDocument.Cv.Languages languages= cv.addNewLanguages();
         /* Items */
-        String[] languagesPivot = request.getParameterValues("language-content");
-        for (int i = 0; i < languagesPivot.length; i++) {
-            LanguageType newLanguage = languages.addNewLanguage();
+        if (request.getParameterValues("language-content") != null) {
+            String[] languagesPivot = request.getParameterValues("language-content");
+            for (int i = 0; i < languagesPivot.length; i++) {
+                LanguageType newLanguage = languages.addNewLanguage();
 
-            if (request.getParameterValues("language-level")[i].equals("novice")) { // NOTE: Cannot use Switch statement to String
-                newLanguage.setLevel(LanguageType.Level.NOVICE);
-            } else if (request.getParameterValues("language-level")[i].equals("beginner")) {
-                newLanguage.setLevel(LanguageType.Level.BEGINNER);
-            } else if (request.getParameterValues("language-level")[i].equals("intermediate")) {
-                newLanguage.setLevel(LanguageType.Level.INTERMEDIATE);
-            } else if (request.getParameterValues("language-level")[i].equals("advanced")) {
-                newLanguage.setLevel(LanguageType.Level.ADVANCED);
-            } else {
-                // TODO: REMOVE
+                if (request.getParameterValues("language-level")[i].equals("novice")) { // NOTE: Cannot use Switch statement to String
+                    newLanguage.setLevel(LanguageType.Level.NOVICE);
+                } else if (request.getParameterValues("language-level")[i].equals("beginner")) {
+                    newLanguage.setLevel(LanguageType.Level.BEGINNER);
+                } else if (request.getParameterValues("language-level")[i].equals("intermediate")) {
+                    newLanguage.setLevel(LanguageType.Level.INTERMEDIATE);
+                } else if (request.getParameterValues("language-level")[i].equals("advanced")) {
+                    newLanguage.setLevel(LanguageType.Level.ADVANCED);
+                } else {
+                    // TODO: REMOVE
+                }
+
+                newLanguage.setStringValue(request.getParameterValues("language-content")[i]);
             }
-
-            newLanguage.setStringValue(request.getParameterValues("language-content")[i]);
         }
-
 
         /* That's all folks! */
         /*********************/
@@ -209,5 +228,27 @@ public class CvManager {
         newPeriod.setTo(newDateTo);
 
         return newPeriod;
+    }
+
+    public CvDocument getCvDocumentByHash(String hash) {
+
+        CvDocument cvDocument = null;
+        try {
+            baseXClient.execute("OPEN JAVA_CVS");
+            BaseXClient.Query query = baseXClient.query(
+                "for $cv in //cv " +
+                "where $cv/meta/hash/text() = \"" + hash + "\" " +
+                "return $cv"
+            );
+            String result = query.execute();
+            result = result.replaceFirst("<cv>", "<cv xmlns=\"http://fi.muni.cz/pb138/cvWebGen/xml\">");
+            cvDocument = CvDocument.Factory.parse(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (XmlException e) {
+            e.printStackTrace();
+        }
+
+        return cvDocument;
     }
 }

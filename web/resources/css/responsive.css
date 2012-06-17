@@ -756,6 +756,8 @@
 }
 dl {
   margin: 0 !important;
+  float: none;
+  clear: left;
 }
 form {
   margin: 0px !important;
@@ -788,4 +790,9 @@ fieldset > .template-trigger-remove {
 }
 #homepage-create .btn {
   width: 100%;
+}
+.viewer dl dt {
+  float: left;
+  margin-right: 10px;
+  width: 140px;
 }

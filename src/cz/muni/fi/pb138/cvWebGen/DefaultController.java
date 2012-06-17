@@ -10,6 +10,9 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,19 +33,38 @@ import java.util.*;
 @RequestMapping(value = "/")
 public class DefaultController {
 
+    private CvManager cvManager;
+    private BaseXClient baseXClient;
+
+    public DefaultController() {
+        cvManager = new CvManager();
+        try {
+            baseXClient = new BaseXClient("localhost", 1984, "admin", "admin");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String homepage(ModelMap model) {
-        model.addAttribute("recentPublicCvs", null);
+        model.addAttribute("recentPublicCvs", null); // TODO: implement
         return "homepage";
     }
 
-    @RequestMapping(value= "/", method = RequestMethod.POST, params = "do=create")
-    public String homepageCreate(ModelMap model, HttpServletRequest request) {
+    @RequestMapping(value = "/about/", method = RequestMethod.GET)
+    public String about(ModelMap model) {
+        return "about";
+    }
 
-        String hash = "";
-        String key = "";
+    @RequestMapping(value= "/editor/create/", method = RequestMethod.POST)
+    public String editorCreate(ModelMap model, HttpServletRequest request) {
+
         String email = request.getParameter("email");
         String privacy = request.getParameter("privacy");
+
+        /* Generate hash & key */
+        String hash = "";
+        String key = "";
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             String toHash = email + new Date().toString();
@@ -55,115 +77,74 @@ public class DefaultController {
             e.printStackTrace();
         }
 
-        return "redirect:editor/"+hash+"/?new=true&email="+email+"&privacy="+privacy+"&key="+key;
-    }
-
-    @RequestMapping(value = "/about/", method = RequestMethod.GET)
-    public String about(ModelMap model) {
-        return "about";
-    }
-
-    @RequestMapping(value = "/editor/{hash}/*", method = RequestMethod.GET)
-    public String editor(ModelMap model, @PathVariable String hash, HttpServletRequest request) {
-        model.addAttribute("hash", hash);
-        if (request.getParameter("key") != null) { model.addAttribute("key", request.getParameter("key")); }
-
-        CvDocument.Cv cv;
-        if (request.getParameter("new") != null) {
-
-            model.addAttribute("new", true);
-            CvDocument cvDocument = CvDocument.Factory.newInstance();
-            cv = cvDocument.addNewCv();
-            MetaType newMeta = cv.addNewMeta();
-            newMeta.setHash(hash);
-            newMeta.setKey(request.getParameter("key"));
-            newMeta.setEmail(request.getParameter("email"));
-            if(request.getParameter("privacy").equals("private")) {
-                newMeta.setPrivacy(MetaType.Privacy.PRIVATE);
-            } else {
-                newMeta.setPrivacy(MetaType.Privacy.PUBLIC);
-            }
-            newMeta.setCreated(Calendar.getInstance());
-
-        } else {
-
-            CvDocument cvDocument = null;
-            try {
-                cvDocument = CvDocument.Factory.parse("AAA");
-            } catch (XmlException e) {
-                e.printStackTrace();
-            }
-            cv = cvDocument.getCv();
-
-        }
-
+        CvDocument cvDocument = CvDocument.Factory.newInstance();
+        CvDocument.Cv cv = cvDocument.addNewCv();
+        MetaType newMeta = cv.addNewMeta();
+        newMeta.setHash(hash);
+        newMeta.setKey(key);
+        newMeta.setEmail(email);
+        if(privacy.equals("private")) {newMeta.setPrivacy(MetaType.Privacy.PRIVATE);} else {newMeta.setPrivacy(MetaType.Privacy.PUBLIC);}
 
         model.addAttribute("cv", cv);
         return "editor";
     }
 
-
-
     @RequestMapping(value="/editor/{hash}/*", method=RequestMethod.POST)
-    public String create(ModelMap model, HttpServletRequest request) {
+    public String editorSave(ModelMap model, @PathVariable String hash, HttpServletRequest request) {
 
-        /* Parse form */
+        CvDocument cvDocument = cvManager.parseFromHtmlFormRequest(request);
+        saveToDb(cvDocument);
+        sentMailToOwner(cvDocument);
 
-        CvManager cvManager = new CvManager();
-        CvDocument doc = cvManager.parseFromHtmlFormRequest(request);
-        Map namespaceForwardMap = new HashMap();
-        namespaceForwardMap.put("", "http://fi.muni.cz/pb138/cvWebGen/xml");
-        String xml = doc.xmlText((new XmlOptions()).setSavePrettyPrint().setUseDefaultNamespace().setSaveImplicitNamespaces(namespaceForwardMap));
+        model.addAttribute("cv", cvDocument.getCv());
+        return "editor-submit";
+    }
 
 
-        BaseXClient session = null;
-        try {
-            session = new BaseXClient("localhost", 1984, "admin", "admin");
-            session.execute("OPEN JAVA_CVS");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @RequestMapping(value = "/editor/{hash}/*", method = RequestMethod.GET)
+    public String editor(ModelMap model, @PathVariable String hash, HttpServletRequest request) {
 
-        try {
-            session.add(doc.getCv().getMeta().getHash(), new ByteArrayInputStream(xml.getBytes("UTF-8")));
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        CvDocument cvDocument = cvManager.getCvDocumentByHash(hash);
 
-        model.addAttribute("xml", xml);
-
-        return "editor-debug";
+        model.addAttribute("cv", cvDocument.getCv());
+        return "editor";
     }
 
     @RequestMapping(value="/viewer/{hash}/", method=RequestMethod.GET)
-    public String viewer(ModelMap model, HttpServletRequest request) throws IOException {
+    public String viewer(ModelMap model, @PathVariable String hash, HttpServletRequest request) {
+        System.out.println(cvManager.getCvDocumentByHash(hash));
+        model.addAttribute("cv", cvManager.getCvDocumentByHash(hash).getCv());
+        return "viewer";
 
-        BaseXClient session = null;
+    }
+
+    private void saveToDb(CvDocument cvDocument) {
+        Map namespaceForwardMap = new HashMap();
+        namespaceForwardMap.put("", "http://fi.muni.cz/pb138/cvWebGen/xml");
+        String xml = cvDocument.xmlText((new XmlOptions()).setSavePrettyPrint().setUseDefaultNamespace().setSaveImplicitNamespaces(namespaceForwardMap));
         try {
-            session = new BaseXClient("localhost", 1984, "admin", "admin");
-            session.execute("OPEN JAVA_CVS");
+            baseXClient.execute("OPEN JAVA_CVS");
+            baseXClient.add(cvDocument.getCv().getMeta().getHash(), new ByteArrayInputStream(xml.getBytes("UTF-8")));
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        BaseXClient.Query query = session.query("for $cv in //cv " +
-                "where $cv/meta/hash/text() = \"18191191494423699403328351497345304946\" " +
-                "return $cv");
-
-        CvDocument.Cv cv = null;
-        try {
-            String result = query.execute();
-            result = result.replaceFirst("<cv>", "<cv xmlns=\"http://fi.muni.cz/pb138/cvWebGen/xml\">");
-            CvDocument cvDocument = CvDocument.Factory.parse(result);
-            cv = cvDocument.getCv();
-        } catch (XmlException e) {
-            e.printStackTrace();
-        }
-
-        model.addAttribute("cv", cv);
-
-        return "viewer";
-
+    private void sentMailToOwner(CvDocument cvDocument) {
+//        SimpleMailMessage msg = new SimpleMailMessage();
+//        msg.setTo(cvDocument.getCv().getMeta().getEmail());
+//        msg.setFrom("admin@cvwebgen.cz");
+//        msg.setText(
+//                "You have created CV on cvWebGen" +
+//                "Vier: " + "/viewer/" + cvDocument.getCv().getMeta().getHash() + "/" +
+//                "Edit: " + "/editor/" + cvDocument.getCv().getMeta().getHash() + "/&key=" + cvDocument.getCv().getMeta().getKey() +
+//                "End of message");
+//        try{
+//            this.mailSender.send(msg);
+//        }
+//        catch(MailException ex) {
+//            System.err.println(ex.getMessage());
+//        }
     }
 
 }

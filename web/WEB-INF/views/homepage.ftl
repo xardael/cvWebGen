@@ -49,7 +49,7 @@
                 <header><h2>Create CV</h2></header>
                 <div class="well">
                     <p class="intro">Creating CV is <strong>very easy and intuitive</strong>, fast, doesn't require no kind of registration and your data will be safe.</p>
-                    <form class="form-vertical" action="/" METHOD="POST">
+                    <form class="form-vertical" action="/editor/create/" METHOD="POST">
 						<input type="hidden" name="do" value="create" />
                         <div class="control-group">
                             <label class="control-label" for="homepage-create-email">E-mail</label>

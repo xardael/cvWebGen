@@ -1,4 +1,4 @@
-<#macro meta hash="" key="" email="" privacy="" created="" modified="">
+<#macro meta hash key email privacy created modified>
 	<div class="span6">
 		<table class="table table-condensed table-bordered">
 			<tbody>
@@ -11,10 +11,18 @@
 		</table>
 	</div>
 	<fieldset class="span6">
-		<div class="control-group" data-field="meta-privacy">
+		<div class="control-group">
 			<label class="control-label">privacy</label>
 			<div class="controls">
-				<input type="text" name="meta-privacy" value="${privacy}">
+				<label class="radio"><input type="radio" name="meta-privacy" value="public" ${(privacy=="public")?string('checked', "")}>public</label>
+				<label class="radio"><input type="radio" name="meta-privacy" value="private" ${(privacy=="private")?string('checked', '')}>private</label>
+				<p class="help-block"></p>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">key</label>
+			<div class="controls">
+				<input type="text" name="key" value="${key!"You have to enter key to edit"}">
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -22,37 +30,37 @@
 </#macro>
 
 
-<#macro fieldsetPersonal firstName="" middleName="" lastName="" dateofbirth="" gender="" nationality="">
+<#macro fieldsetPersonal firstName middleName lastName dateofbirth gender nationality>
 	<fieldset>
-		<div class="control-group" data-field="personal-firstName">
+		<div class="control-group">
 			<label class="control-label">firstName</label>
 			<div class="controls">
 				<input type="text" name="personal-firstName" value="${firstName}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="personal-middleName">
+		<div class="control-group">
 			<label class="control-label">middleName</label>
 			<div class="controls">
 				<input type="text" name="personal-middleName" value="${middleName}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="personal-lastName">
+		<div class="control-group">
 			<label class="control-label">lastName</label>
 			<div class="controls">
 				<input type="text" name="personal-lastName" value="${lastName}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="personal-dateofbirth">
+		<div class="control-group">
 			<label class="control-label">dateofbirth</label>
 			<div class="controls">
 				<input type="date" name="personal-dateofbirth" value="${dateofbirth}"/>
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="personal-gender">
+		<div class="control-group">
 			<label class="control-label">gender</label>
 			<div class="controls">
 				<label class="radio"><input type="radio" name="personal-gender" value="male" ${(gender=="male")?string('checked', "")}>Male</label>
@@ -60,7 +68,7 @@
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="personal-nationality">
+		<div class="control-group">
 			<label class="control-label">nationality</label>
 			<div class="controls">
 				<input type="text" name="personal-nationality" value="${nationality}">
@@ -71,37 +79,37 @@
 </#macro>
 
 
-<#macro fieldsetAddress street="" city="" zip="" state="" description="">
+<#macro fieldsetAddress street city zip state description>
 	<fieldset>
-		<div class="control-group" data-field="address-street">
+		<div class="control-group">
 			<label class="control-label">street</label>
 			<div class="controls">
 				<input type="text" name="address-street" value="${street}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="address-city">
+		<div class="control-group">
 			<label class="control-label">city</label>
 			<div class="controls">
 				<input type="text" name="address-city" value="${city}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="address-zip">
+		<div class="control-group">
 			<label class="control-label">zip</label>
 			<div class="controls">
 				<input type="text" name="address-zip" value="${zip}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="address-state">
+		<div class="control-group">
 			<label class="control-label">state</label>
 			<div class="controls">
 				<input type="text" name="address-state" value="${state}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="address-description">
+		<div class="control-group">
 			<label class="control-label">description</label>
 			<div class="controls">
 				<input type="text" name="address-description" value="${description}">
@@ -112,9 +120,9 @@
 </#macro>
 
 
-<#macro fieldsetContactPhone type="" content="">
+<#macro fieldsetContactPhone type content>
 	<fieldset>
-		<div class="control-group" data-field="contact-phone">
+		<div class="control-group">
 			<label class="control-label"><i class="icon icon-minus-sign template-trigger-remove"></i> Phone</label>
 			<div class="controls">
 				<div class="input-prepend">
@@ -127,9 +135,9 @@
 	</fieldset>
 </#macro>
 
-<#macro fieldsetContactEmail content="">
+<#macro fieldsetContactEmail content>
 	<fieldset>
-		<div class="control-group" data-field="">
+		<div class="control-group">
 			<label class="control-label"><i class="icon icon-minus-sign template-trigger-remove"></i> Email</label>
 			<div class="controls">
 				<input type="text" name="contact-email-content" value="${content}">
@@ -139,9 +147,9 @@
 	</fieldset>
 </#macro>
 
-<#macro fieldsetContactWebsite content="">
+<#macro fieldsetContactWebsite content>
 	<fieldset>
-		<div class="control-group" data-field="">
+		<div class="control-group">
 			<label class="control-label"><i class="icon icon-minus-sign template-trigger-remove"></i> Website</label>
 			<div class="controls">
 				<input type="text" name="contact-website-content" value="${content}">
@@ -152,23 +160,23 @@
 </#macro>
 
 
-<#macro fieldsetPeriod parent="" fromYear="" fromMonth="" fromDay="" toYear="" toMonth="" toDay="">
+<#macro fieldsetPeriod parent="" period="">
 	<fieldset>
-		<div class="control-group" data-field="${parent}-period-from">
+		<div class="control-group">
 			<label class="control-label">period from</label>
 			<div class="controls">
-				<div class="input-prepend"><span class="add-on">YYYY</span><input type="text" name="${parent}-period-from-year" value="${fromYear}" style="width: 40px;"></div>
-				<div class="input-prepend"><span class="add-on">MM</span><input type="text" name="${parent}-period-from-month" value="${fromMonth}" style="width: 40px;"></div>
-				<div class="input-prepend"><span class="add-on">DD</span><input type="text" name="${parent}-period-from-day" value="${fromDay}" style="width: 40px;"></div>
+				<div class="input-prepend"><span class="add-on">YYYY</span><input type="text" name="${parent}-period-from-year" value="<#if !period?is_string>${period.from.year}</#if>" style="width: 40px;"></div>
+				<div class="input-prepend"><span class="add-on">MM</span><input type="text" name="${parent}-period-from-month" value="" style="width: 40px;"></div>
+				<div class="input-prepend"><span class="add-on">DD</span><input type="text" name="${parent}-period-from-day" value="" style="width: 40px;"></div>
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="work-period-from">
+		<div class="control-group">
 			<label class="control-label">period to</label>
 			<div class="controls">
-				<div class="input-prepend"><span class="add-on">YYYY</span><input type="text" name="${parent}-period-to-year" value="${toYear}" style="width: 40px;"></div>
-				<div class="input-prepend"><span class="add-on">MM</span><input type="text" name="${parent}-period-to-month" value="${toMonth}" style="width: 40px;"></div>
-				<div class="input-prepend"><span class="add-on">DD</span><input type="text" name="${parent}-period-to-day" value="${toDay}" style="width: 40px;"></div>
+				<div class="input-prepend"><span class="add-on">YYYY</span><input type="text" name="${parent}-period-to-year" value="" style="width: 40px;"></div>
+				<div class="input-prepend"><span class="add-on">MM</span><input type="text" name="${parent}-period-to-month" value="" style="width: 40px;"></div>
+				<div class="input-prepend"><span class="add-on">DD</span><input type="text" name="${parent}-period-to-day" value="" style="width: 40px;"></div>
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -176,32 +184,32 @@
 </#macro>
 
 
-<#macro fieldsetWork employer="" position="" activities="" sector="">
+<#macro fieldsetWork period employer position activities sector>
 	<fieldset class="well">
 		<i class="icon icon-minus-sign template-trigger-remove"></i>
-		<@fieldsetPeriod parent="work" />
-		<div class="control-group" data-field="work-employer">
+		<@fieldsetPeriod parent="work" period=period />
+		<div class="control-group">
 			<label class="control-label">employer</label>
 			<div class="controls">
 				<input type="text" name="work-employer" value="${employer}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="work-position">
+		<div class="control-group">
 			<label class="control-label">position</label>
 			<div class="controls">
 				<input type="text" name="work-position" value="${position}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="work-activities">
+		<div class="control-group">
 			<label class="control-label">activities</label>
 			<div class="controls">
 				<input type="text" name="work-activities" value="${activities}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="work-sector">
+		<div class="control-group">
 			<label class="control-label">sector</label>
 			<div class="controls">
 				<input type="text" name="work-sector" value="${sector}">
@@ -212,18 +220,18 @@
 </#macro>
 
 
-<#macro fieldsetEducation organisation="" description="">
+<#macro fieldsetEducation period organisation description>
 	<fieldset class="well">
 		<i class="icon icon-minus-sign template-trigger-remove"></i>
-		<@fieldsetPeriod parent="education" />
-		<div class="control-group" data-field="education-organisation">
+		<@fieldsetPeriod parent="education" period=period />
+		<div class="control-group">
 			<label class="control-label">organisation</label>
 			<div class="controls">
 				<input type="text" name="education-organisation" value="${organisation}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group" data-field="education-description">
+		<div class="control-group">
 			<label class="control-label">description</label>
 			<div class="controls">
 				<input type="text" name="education-description" value="${description}">
@@ -233,9 +241,9 @@
 	</fieldset>
 </#macro>
 
-<#macro fieldsetSkill name="" content="">
+<#macro fieldsetSkill name content>
 	<fieldset>
-		<div class="control-group" data-field="skill">
+		<div class="control-group">
 			<div class="controls controls-wide">
 				<i class="icon icon-minus-sign template-trigger-remove"></i>
 				<div class="input-prepend">
@@ -248,9 +256,9 @@
 	</fieldset>
 </#macro>
 
-<#macro fieldsetLanguage level="" content="">
+<#macro fieldsetLanguage level content>
 	<fieldset>
-		<div class="control-group" data-field="language">
+		<div class="control-group">
 			<div class="controls controls-wide">
 				<i class="icon icon-minus-sign template-trigger-remove"></i>
 				<select name="language-level">

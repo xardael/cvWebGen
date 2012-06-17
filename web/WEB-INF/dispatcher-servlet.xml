@@ -41,6 +41,4 @@
         <property name="exposeSpringMacroHelpers" value="true"/>
     </bean>
 
-    <!--<bean id="cvManager" class="cz.muni.fi.pb138.cvWebGen.CvManager" />-->
-
 </beans>
