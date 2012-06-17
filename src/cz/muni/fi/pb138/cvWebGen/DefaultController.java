@@ -4,12 +4,6 @@ import cz.muni.fi.pb138.cvWebGen.xml.CvDocument;
 import cz.muni.fi.pb138.cvWebGen.xml.MetaType;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Open;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -120,6 +113,7 @@ public class DefaultController {
         try {
             session = new BaseXClient("localhost", 1984, "admin", "admin");
             session.execute("OPEN JAVA_CVS");
+            System.out.println(session.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -132,6 +126,8 @@ public class DefaultController {
 
         model.addAttribute("xml", xml);
 
+        String path = Latex.generatePdf("cv");
+        
         return "editor-debug";
     }
 
@@ -147,9 +143,9 @@ public class DefaultController {
         }
 
         BaseXClient.Query query = session.query("for $cv in //cv " +
-                "where $cv/meta/hash/text() = \"18191191494423699403328351497345304946\" " +
+                "where $cv/meta/hash/text() = \"89111947844187767289732257559715937277\" " +
                 "return $cv");
-
+                    
         CvDocument.Cv cv = null;
         try {
             String result = query.execute();
@@ -161,6 +157,8 @@ public class DefaultController {
         }
 
         model.addAttribute("cv", cv);
+        
+        
 
         return "viewer";
 
