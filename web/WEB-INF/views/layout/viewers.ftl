@@ -1,28 +1,4 @@
-<#macro meta hash="" key="" email="" privacy="" created="" modified="">
-	<div class="span6">
-		<table class="table table-condensed table-bordered">
-			<tbody>
-				<tr><th>Email</th><td>${email} <input type="hidden" name="meta-email" value="${email}" /></td></tr>
-				<tr><th>Hash</th><td>${hash} <input type="hidden" name="meta-hash" value="${hash}" /></td></tr>
-				<tr><th>Key</th><td>${key} <input type="hidden" name="meta-key" value="${key}" /></td></tr>
-				<tr><th>Created</th><td>${created}</td></tr>
-				<tr><th>Modified</th><td>${modified}</td></tr>
-			</tbody>
-		</table>
-	</div>
-	<fieldset class="span6">
-		<div class="control-group" data-field="meta-privacy">
-			<label class="control-label">privacy</label>
-			<div class="controls">
-				<input type="text" name="meta-privacy" value="${privacy}">
-				<p class="help-block"></p>
-			</div>
-		</div>
-	</fieldset>
-</#macro>
-
-
-<#macro fieldsetPersonal firstName="" middleName="" lastName="" dateofbirth="" gender="" nationality="">
+<#macro viewerPersonal firstName middleName lastName dateofbirth gender nationality>
 	<fieldset>
 		<div class="control-group" data-field="personal-firstName">
 			<label class="control-label">firstName</label>
@@ -71,7 +47,7 @@
 </#macro>
 
 
-<#macro fieldsetAddress street="" city="" zip="" state="" description="">
+<#macro viewerAddress street city zip state description>
 	<fieldset>
 		<div class="control-group" data-field="address-street">
 			<label class="control-label">street</label>
@@ -112,7 +88,7 @@
 </#macro>
 
 
-<#macro fieldsetContactPhone type="" content="">
+<#macro viewerContactPhone type content>
 	<fieldset>
 		<div class="control-group" data-field="contact-phone">
 			<label class="control-label"><i class="icon icon-minus-sign template-trigger-remove"></i> Phone</label>
@@ -127,9 +103,9 @@
 	</fieldset>
 </#macro>
 
-<#macro fieldsetContactEmail content="">
+<#macro viewerContactEmail content>
 	<fieldset>
-		<div class="control-group" data-field="">
+		<div class="control-group" data-field>
 			<label class="control-label"><i class="icon icon-minus-sign template-trigger-remove"></i> Email</label>
 			<div class="controls">
 				<input type="text" name="contact-email-content" value="${content}">
@@ -139,9 +115,9 @@
 	</fieldset>
 </#macro>
 
-<#macro fieldsetContactWebsite content="">
+<#macro viewerContactWebsite content>
 	<fieldset>
-		<div class="control-group" data-field="">
+		<div class="control-group" data-field>
 			<label class="control-label"><i class="icon icon-minus-sign template-trigger-remove"></i> Website</label>
 			<div class="controls">
 				<input type="text" name="contact-website-content" value="${content}">
@@ -152,7 +128,7 @@
 </#macro>
 
 
-<#macro fieldsetPeriod parent="" fromYear="" fromMonth="" fromDay="" toYear="" toMonth="" toDay="">
+<#macro viewerPeriod parent fromYear fromMonth fromDay toYear toMonth toDay>
 	<fieldset>
 		<div class="control-group" data-field="${parent}-period-from">
 			<label class="control-label">period from</label>
@@ -176,7 +152,7 @@
 </#macro>
 
 
-<#macro fieldsetWork employer="" position="" activities="" sector="">
+<#macro viewerWork employer position activities sector>
 	<fieldset class="well">
 		<i class="icon icon-minus-sign template-trigger-remove"></i>
 		<@fieldsetPeriod parent="work" />
@@ -212,7 +188,7 @@
 </#macro>
 
 
-<#macro fieldsetEducation organisation="" description="">
+<#macro viewerEducation organisation description>
 	<fieldset class="well">
 		<i class="icon icon-minus-sign template-trigger-remove"></i>
 		<@fieldsetPeriod parent="education" />
@@ -233,7 +209,7 @@
 	</fieldset>
 </#macro>
 
-<#macro fieldsetSkill name="" content="">
+<#macro viewerSkill name content>
 	<fieldset>
 		<div class="control-group" data-field="skill">
 			<div class="controls controls-wide">
@@ -248,7 +224,7 @@
 	</fieldset>
 </#macro>
 
-<#macro fieldsetLanguage level="" content="">
+<#macro viewerLanguage level content>
 	<fieldset>
 		<div class="control-group" data-field="language">
 			<div class="controls controls-wide">

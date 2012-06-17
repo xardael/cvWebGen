@@ -18,6 +18,21 @@ public class CvManager {
         CvDocument cvDocument = CvDocument.Factory.newInstance();
         CvDocument.Cv cv = cvDocument.addNewCv();
 
+        /* Meta */
+        /********/
+        MetaType meta = cv.addNewMeta();
+        meta.setHash(request.getParameter("meta-hash"));
+        meta.setKey(request.getParameter("meta-key"));
+        meta.setEmail(request.getParameter("meta-email"));
+        if (request.getParameter("meta-privacy").equals("private")) {
+            meta.setPrivacy(MetaType.Privacy.PRIVATE);
+        } else {
+            meta.setPrivacy(MetaType.Privacy.PUBLIC);
+        }
+        meta.setCreated(Calendar.getInstance()); // TODO: Do not change when modify
+        meta.setModified(Calendar.getInstance());
+
+
         /* Personal */
         /************/
         PersonalType personal = cv.addNewPersonal();
@@ -45,7 +60,7 @@ public class CvManager {
             personal.setDateofbirth(cal);
         }
         /* gender */
-        if (request.getParameter("personal-gender") == "male") {
+        if (request.getParameter("personal-gender").equals("male")) {
             personal.setGender(PersonalType.Gender.MALE);
         } else {
             personal.setGender(PersonalType.Gender.FEMALE);
@@ -85,22 +100,29 @@ public class CvManager {
         /************/
         CvDocument.Cv.Contacts contacts = cv.addNewContacts();
         /* Phones */
-        String[] phonesPivot = request.getParameterValues("contact-phone-content");
-        for (int i = 0; i < phonesPivot.length; i++) {
-            CvDocument.Cv.Contacts.Phone newPhone = contacts.addNewPhone();
-            newPhone.setType(request.getParameterValues("contact-phone-type")[i]);
-            newPhone.setStringValue(request.getParameterValues("contact-phone-content")[i]);
+        if (request.getParameterValues("contact-phone-content") != null) {
+            String[] phonesPivot = request.getParameterValues("contact-phone-content");
+            for (int i = 0; i < phonesPivot.length; i++) {
+                CvDocument.Cv.Contacts.Phone newPhone = contacts.addNewPhone();
+                newPhone.setType(request.getParameterValues("contact-phone-type")[i]);
+                newPhone.setStringValue(request.getParameterValues("contact-phone-content")[i]);
+            }
         }
         /* Emails */
-        String[] emailsPivot = request.getParameterValues("contact-email-content");
-        for (int i = 0; i < emailsPivot.length; i++) {
-            contacts.addEmail(request.getParameterValues("contact-email-content")[i]);
+        if (request.getParameterValues("contact-email-content") != null) {
+            String[] emailsPivot = request.getParameterValues("contact-email-content");
+            for (int i = 0; i < emailsPivot.length; i++) {
+                contacts.addEmail(request.getParameterValues("contact-email-content")[i]);
+            }
         }
         /* Websites */
-        String[] websitesPivot = request.getParameterValues("contact-website-content");
-        for (int i = 0; i < websitesPivot.length; i++) {
-            contacts.addWebsite(request.getParameterValues("contact-website-content")[i]);
+        if (request.getParameterValues("contact-website-content") != null) {
+            String[] websitesPivot = request.getParameterValues("contact-website-content");
+            for (int i = 0; i < websitesPivot.length; i++) {
+                contacts.addWebsite(request.getParameterValues("contact-website-content")[i]);
+            }
         }
+
 
         /* Works */
         /*********/
@@ -119,15 +141,54 @@ public class CvManager {
 
         /* Educations */
         /**************/
-
+        CvDocument.Cv.Educations educations = cv.addNewEducations();
+        /* Items */
+        String[] educationsPivot = request.getParameterValues("education-organisation");
+        for (int i = 0; i < educationsPivot.length; i++) {
+            EducationType newEducation = educations.addNewEducation();
+            newEducation.setPeriod(this._parsePeriod(request, "education", i));
+            newEducation.setOrganisation(request.getParameterValues("education-organisation")[i]);
+            newEducation.setDescription(request.getParameterValues("education-description")[i]);
+        }
 
         /* Skills */
         /**********/
+        CvDocument.Cv.Skills skills= cv.addNewSkills();
+        /* Items */
+        String[] skillsPivot = request.getParameterValues("skill-name");
+        for (int i = 0; i < skillsPivot.length; i++) {
+            SkillType newSkill = skills.addNewSkill();
+            newSkill.setName(request.getParameterValues("skill-name")[i]);
+            newSkill.setStringValue(request.getParameterValues("skill-content")[i]);
+        }
 
 
         /* Languages */
         /*************/
+        CvDocument.Cv.Languages languages= cv.addNewLanguages();
+        /* Items */
+        String[] languagesPivot = request.getParameterValues("language-content");
+        for (int i = 0; i < languagesPivot.length; i++) {
+            LanguageType newLanguage = languages.addNewLanguage();
 
+            if (request.getParameterValues("language-level")[i].equals("novice")) { // NOTE: Cannot use Switch statement to String
+                newLanguage.setLevel(LanguageType.Level.NOVICE);
+            } else if (request.getParameterValues("language-level")[i].equals("beginner")) {
+                newLanguage.setLevel(LanguageType.Level.BEGINNER);
+            } else if (request.getParameterValues("language-level")[i].equals("intermediate")) {
+                newLanguage.setLevel(LanguageType.Level.INTERMEDIATE);
+            } else if (request.getParameterValues("language-level")[i].equals("advanced")) {
+                newLanguage.setLevel(LanguageType.Level.ADVANCED);
+            } else {
+                // TODO: REMOVE
+            }
+
+            newLanguage.setStringValue(request.getParameterValues("language-content")[i]);
+        }
+
+
+        /* That's all folks! */
+        /*********************/
         return cvDocument;
 
     }
@@ -137,12 +198,12 @@ public class CvManager {
         DateType newDateFrom = DateType.Factory.newInstance();
         DateType newDateTo = DateType.Factory.newInstance();
 
-        if (request.getParameterValues(parent + "-period-from-year") != null && request.getParameterValues(parent + "-period-from-year")[i] != null) { newDateFrom.setYear(BigInteger.valueOf(Integer.valueOf(request.getParameterValues(parent + "-period-from-year")[i]))); }
-        if (request.getParameterValues(parent + "-period-from-month") != null && request.getParameterValues(parent + "-period-from-month")[i] != null) { newDateFrom.setMonth(Integer.valueOf(request.getParameterValues(parent + "-period-from-month")[i])); }
-        if (request.getParameterValues(parent + "-period-from-day") != null && request.getParameterValues(parent + "-period-from-day")[i] != null) { newDateFrom.setDay(Integer.valueOf(request.getParameterValues(parent + "-period-from-day")[i])); }
-        if (request.getParameterValues(parent + "-period-to-year") != null && request.getParameterValues(parent + "-period-to-year")[i] != null) { newDateTo.setYear(BigInteger.valueOf(Integer.valueOf(request.getParameterValues(parent + "-period-to-year")[i]))); }
-        if (request.getParameterValues(parent + "-period-to-month") != null && request.getParameterValues(parent + "-period-to-month")[i] != null) { newDateTo.setMonth(Integer.valueOf(request.getParameterValues(parent + "-period-to-month")[i])); }
-        if (request.getParameterValues(parent + "-period-to-day") != null && request.getParameterValues(parent + "-period-to-day")[i] != null) { newDateTo.setDay(Integer.valueOf(request.getParameterValues(parent + "-period-to-day")[i])); }
+        if (request.getParameterValues(parent + "-period-from-year") != null && !request.getParameterValues(parent + "-period-from-year")[i].isEmpty()) { newDateFrom.setYear(BigInteger.valueOf(Integer.valueOf(request.getParameterValues(parent + "-period-from-year")[i]))); }
+        if (request.getParameterValues(parent + "-period-from-month") != null && !request.getParameterValues(parent + "-period-from-month")[i].isEmpty()) { newDateFrom.setMonth(Integer.valueOf(request.getParameterValues(parent + "-period-from-month")[i])); }
+        if (request.getParameterValues(parent + "-period-from-day") != null && !request.getParameterValues(parent + "-period-from-day")[i].isEmpty()) { newDateFrom.setDay(Integer.valueOf(request.getParameterValues(parent + "-period-from-day")[i])); }
+        if (request.getParameterValues(parent + "-period-to-year") != null && !request.getParameterValues(parent + "-period-to-year")[i].isEmpty()) { newDateTo.setYear(BigInteger.valueOf(Integer.valueOf(request.getParameterValues(parent + "-period-to-year")[i]))); }
+        if (request.getParameterValues(parent + "-period-to-month") != null && !request.getParameterValues(parent + "-period-to-month")[i].isEmpty()) { newDateTo.setMonth(Integer.valueOf(request.getParameterValues(parent + "-period-to-month")[i])); }
+        if (request.getParameterValues(parent + "-period-to-day") != null && !request.getParameterValues(parent + "-period-to-day")[i].isEmpty()) { newDateTo.setDay(Integer.valueOf(request.getParameterValues(parent + "-period-to-day")[i])); }
 
         newPeriod.setFrom(newDateFrom);
         newPeriod.setTo(newDateTo);

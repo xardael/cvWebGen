@@ -754,6 +754,15 @@
 .form-horizontal .control-label {
   text-align: left;
 }
+dl {
+  margin: 0 !important;
+}
+form {
+  margin: 0px !important;
+}
+.form-actions {
+  margin-bottom: 0px !important;
+}
 section.editor {
   padding-top: 17px;
   margin: 18px 0;
@@ -767,4 +776,16 @@ fieldset > .template-trigger-remove {
   position: absolute;
   left: -20px;
   top: 5px;
+}
+.controls.controls-wide {
+  position: relative;
+  margin-left: 0px;
+}
+.controls.controls-wide > .template-trigger-remove {
+  position: absolute;
+  left: -20px;
+  top: 5px;
+}
+#homepage-create .btn {
+  width: 100%;
 }
