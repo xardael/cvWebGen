@@ -35,8 +35,8 @@
                 <thead><tr><th>#</th><th>Name</th><th>Preview</th></tr></thead>
                 <tbody>
                 <#if (recentPublicCvs)??>
-                    <#list recentCvs as cv>
-                        <tr><td>${cv.id}</td><td>${cv.user}</td><td>${cv.preview}</td></tr>
+                    <#list recentPublicCvs as cvDoc>
+                        <tr><td>${(cvDoc.cv.meta.hash)!"No hash"}</td></tr>
                     </#list>
                 <#else>
                     <tr><td colspan="3">No data</td></tr>

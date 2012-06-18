@@ -20,7 +20,10 @@ public class DefaultController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String homepage(ModelMap model) {
-        // model.addAttribute("recentPublicCvs", cvManager.getPublic(25)); // TODO: implement
+        model.addAttribute("recentPublicCvs", cvManager.getPublic());
+        for (CvDocument cvDocument : cvManager.getPublic()) {
+            LOGGER.log(Level.INFO, "Loaded public CV " + cvDocument.getCv().getMeta().getHash());
+        }
         return "homepage";
     }
 

@@ -5,10 +5,19 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -325,20 +334,38 @@ public class CvManager {
         return cvDocument;
     }
 
-    public CvDocument getPublic(int limit) {
-        CvDocument result = null;
+    public List<CvDocument> getPublic() {
+        List<CvDocument> result = new ArrayList<CvDocument>();
         try {
             BaseXClient.Query query = baseXClient.query(
-              "for $cv in //cv " +
-              "where $cv/meta/privacy == \"public\" " +
-              "return $cv"
+                    "<result> {" +
+                    "for $cv in //cv " +
+                    "where $cv/meta/privacy = \"public\" " +
+                    "return <cv><hash>{$cv/meta/hash/text()}</hash><key>{$cv/meta/key/text()}</key></cv> " +
+                    " } </result>"
             );
             String execute = query.execute();
-            execute = execute.replaceAll("<cv>", "<cv xmlns=\"http://fi.muni.cz/pb138/cvWebGen/xml\">"); // HACK: Add namespace, must be trimmed before saving to DB
-            result = CvDocument.Factory.parse(execute);
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = null;
+            db = dbf.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(execute));
+            try {
+                Document document = db.parse(is);
+                for (int i = 0; i < document.getElementsByTagName("cv").getLength(); i++) {
+                    Element element = (Element) document.getElementsByTagName("cv").item(i);
+                    CvDocument cvDocument = CvDocument.Factory.newInstance();
+                    CvDocument.Cv cv = cvDocument.addNewCv();
+                    MetaType newMeta = cv.addNewMeta();
+                    newMeta.setHash(element.getElementsByTagName("hash").item(0).getTextContent());
+                    newMeta.setKey(element.getElementsByTagName("key").item(0).getTextContent());
+                    result.add(cvDocument);
+                }
+            } catch (SAXException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (XmlException e) {
+        } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
         return result;
