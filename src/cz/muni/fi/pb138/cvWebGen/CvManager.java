@@ -1,8 +1,10 @@
 package cz.muni.fi.pb138.cvWebGen;
 
+import com.sun.org.apache.xerces.internal.xs.datatypes.XSDateTime;
 import cz.muni.fi.pb138.cvWebGen.xml.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.xmlbeans.XmlDateTime;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.w3c.dom.Document;
@@ -341,7 +343,7 @@ public class CvManager {
                     "<result> {" +
                     "for $cv in //cv " +
                     "where $cv/meta/privacy = \"public\" " +
-                    "return <cv><hash>{$cv/meta/hash/text()}</hash><key>{$cv/meta/key/text()}</key></cv> " +
+                    "return <cv><hash>{$cv/meta/hash/text()}</hash> <firstName>{$cv/personal/firstName/text()}</firstName> <lastName>{$cv/personal/lastName/text()}</lastName></cv> " +
                     " } </result>"
             );
             String execute = query.execute();
@@ -349,23 +351,23 @@ public class CvManager {
             DocumentBuilder db = null;
             db = dbf.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(execute));
-            try {
-                Document document = db.parse(is);
-                for (int i = 0; i < document.getElementsByTagName("cv").getLength(); i++) {
-                    Element element = (Element) document.getElementsByTagName("cv").item(i);
-                    CvDocument cvDocument = CvDocument.Factory.newInstance();
-                    CvDocument.Cv cv = cvDocument.addNewCv();
-                    MetaType newMeta = cv.addNewMeta();
-                    newMeta.setHash(element.getElementsByTagName("hash").item(0).getTextContent());
-                    newMeta.setKey(element.getElementsByTagName("key").item(0).getTextContent());
-                    result.add(cvDocument);
-                }
-            } catch (SAXException e) {
-                e.printStackTrace();
+            Document document = db.parse(is);
+            for (int i = 0; i < document.getElementsByTagName("cv").getLength(); i++) {
+                Element element = (Element) document.getElementsByTagName("cv").item(i);
+                CvDocument cvDocument = CvDocument.Factory.newInstance();
+                CvDocument.Cv cv = cvDocument.addNewCv();
+                MetaType newMeta = cv.addNewMeta();
+                newMeta.setHash(element.getElementsByTagName("hash").item(0).getTextContent());
+                PersonalType newPersonal = cv.addNewPersonal();
+                newPersonal.setFirstName(element.getElementsByTagName("firstName").item(0).getTextContent());
+                newPersonal.setLastName(element.getElementsByTagName("lastName").item(0).getTextContent());
+                result.add(cvDocument);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
             e.printStackTrace();
         }
         return result;
@@ -376,7 +378,7 @@ public class CvManager {
         try {
             baseXClient.add(cvDocument.getCv().getMeta().getHash(), new ByteArrayInputStream(this.prettyXml(cvDocument).getBytes("UTF-8")));
         } catch (IOException e) {
-            LOGGER.log(Level.ERROR, "Cannot persist");
+            LOGGER.log(Level.ERROR, "Cannot persist", e);
         }
     }
 
@@ -394,5 +396,43 @@ public class CvManager {
             LOGGER.log(Level.INFO, "unpersist: FAILED");
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
+    }
+
+    public List<CvDocument> getByEmail(String email) {
+        List<CvDocument> result = new ArrayList<CvDocument>();
+        try {
+            BaseXClient.Query query = baseXClient.query(
+                    "<result> {" +
+                            "for $cv in //cv " +
+                            "where $cv/meta/email = \"" + email + "\" " +
+                            "return <cv><hash>{$cv/meta/hash/text()}</hash> <key>{$cv/meta/key/text()}</key> <firstName>{$cv/personal/firstName/text()}</firstName> <lastName>{$cv/personal/lastName/text()}</lastName></cv> " +
+                            " } </result>"
+            );
+            String execute = query.execute();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = null;
+            db = dbf.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(execute));
+            Document document = db.parse(is);
+            for (int i = 0; i < document.getElementsByTagName("cv").getLength(); i++) {
+                Element element = (Element) document.getElementsByTagName("cv").item(i);
+                CvDocument cvDocument = CvDocument.Factory.newInstance();
+                CvDocument.Cv cv = cvDocument.addNewCv();
+                MetaType newMeta = cv.addNewMeta();
+                newMeta.setHash(element.getElementsByTagName("hash").item(0).getTextContent());
+                newMeta.setKey(element.getElementsByTagName("key").item(0).getTextContent());
+                PersonalType newPersonal = cv.addNewPersonal();
+                newPersonal.setFirstName(element.getElementsByTagName("firstName").item(0).getTextContent());
+                newPersonal.setLastName(element.getElementsByTagName("lastName").item(0).getTextContent());
+                result.add(cvDocument);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

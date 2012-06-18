@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<cv xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cv.xsd">
+<cv xmlns="http://fi.muni.cz/pb138/cvWebGen/xml">
     <meta>
-        <created>2012-05-24T16:12:33</created>
-        <modified>2012-05-24T16:12:33</modified>
+        <hash>52844960183869587892837079913906901796</hash>
+        <key>92152299617545191900295477574603712674</key>
         <email>jana@example.com</email>
         <privacy>public</privacy>
+        <created>2012-05-24T16:12:33</created>
+        <modified>2012-05-24T16:12:33</modified>
     </meta>
     <personal>
         <firstName>Anna</firstName>

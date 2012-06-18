@@ -2,119 +2,85 @@
 <#include "/layout/navigation.ftl">
 <div class="container">
 
+	<div class="heading"><h2>Viewing CV: ${(cv.personal.firstName)!""} ${(cv.personal.lastName)!""}</h2></div>
+
 	<section class="row-fluid" id="viewer-controls">
-		<div class="span6">
-			<p><a class="btn" href="/editor/${cv.meta.hash}/">Edit CV</a></p>
-			<p>You need to know key to edit.</p>
-		</div>
+		<p><a class="btn btn-danger" href="/editor/${cv.meta.hash}/?key=${cv.meta.key}">Edit CV [DEBUG]</a> <a class="btn" href="/export/${cv.meta.hash}.pdf">Export to PDF</a> <a class="btn" href="/viewer/${cv.meta.hash}/export.xml">Export to XML</a> </p>
 	</section>
 
-	<section class="viewer row-fluid" id="viewer-personal">
-		<header class="span3">
-			<h3>Personal</h3>
-		</header>
-		<div class="placeholder span9">
-			<dl><dt>firstName</dt><dd>${(cv.personal.firstName)!""}</dd></dl>
-			<dl><dt>middleName</dt><dd>${(cv.personal.middleName)!""}</dd></dl>
-			<dl><dt>lastName</dt><dd>${(cv.personal.lastName)!""}</dd></dl>
-			<dl><dt>dateofbirth</dt><dd>${(cv.personal.dateofbirth)!""}</dd></dl>
-			<dl><dt>gender</dt><dd>${(cv.personal.gender=="male")?string('male', "female")}</dd></dl>
-			<dl><dt>nationality</dt><dd>${(cv.personal.nationality)!""}</dd></dl>
-		</div>
-	</section>
+	<div class="row-fluid well">
+		<section class="viewer span6">
+			<header><h3>Personal & Contact</h3></header>
+			<dl><dt>Name</dt><dd>${(cv.personal.firstName)!"-"} ${(cv.personal.middleName)!"-"} ${(cv.personal.lastName)!"-"}</dd></dl>
+			<dl><dt>Birth</dt><dd>${(cv.personal.dateofbirth)!"-"}</dd></dl>
+			<dl><dt>Gender</dt><dd>${(cv.personal.gender=="male")?string('male', "female")}</dd></dl>
+			<dl><dt>Nationality</dt><dd>${(cv.personal.nationality)!"-"}</dd></dl>
+			<hr />
+			<dl>
+				<dt>Address</dt>
+				<dd>${(cv.address.street)!"-"}<br />${(cv.address.city)!"-"}<br />${(cv.address.zip)!"-"}<br />${(cv.address.state)!"-"}<br />${(cv.address.description)!"-"}</dd>
+			</dl>
+			<hr />
+			<dl>
+				<dt>Phones</dt>
+				<dd><#list cv.getContacts().getPhoneArray() as phone><div>(${phone.getType()!"-"}) ${phone.getStringValue()!""}</div></#list></dd>
+			</dl>
+			<dl>
+				<dt>Emails</dt>
+				<dd><#list cv.getContacts().getEmailArray() as email><div>${email!""}</div></#list></dd>
+			</dl>
+			<dl>
+				<dt>Website</dt>
+				<dd><#list cv.getContacts().getWebsiteArray() as website><div>${website!""}</div></#list></dd>
+			</dl>
+		</section>
 
-	<section class="viewer row-fluid" id="viewer-address">
-		<header class="span3">
-			<h3>Address</h3>
-		</header>
-		<div class="placeholder span9">
-			<dl><dt>street</dt><dd>${(cv.address.street)!""}</dd></dl>
-			<dl><dt>city</dt><dd>${(cv.address.city)!""}</dd></dl>
-			<dl><dt>zip</dt><dd>${(cv.address.zip)!""}</dd></dl>
-			<dl><dt>state</dt><dd>${(cv.address.state)!""}</dd></dl>
-			<dl><dt>description</dt><dd>${(cv.address.description)!""}</dd></dl>
-		</div>
-	</section>
+		<section class="viewer span6">
+			<header><h3>Languages & Skills</h3></header>
+			<dl>
+				<dt>Languages</dt>
+				<dd><#list cv.getLanguages().getLanguageArray() as language><div>${language.getStringValue()!""} (${language.getLevel()!""})</div></#list></dd>
+			</dl>
+			<hr />
+			<dl>
+				<#list cv.getSkills().getSkillArray() as skill>
+					<dt>${skill.getName()!""}</dt>
+					<dd>${skill.getStringValue()!""}</dd>
+				</#list>
+			</dl>
+		</section>
+	</div>
 
-	<section class="viewer row-fluid" id="viewer-contacts">
-		<header class="span3">
-			<h3>Contacts</h3>
-		</header>
-		<div class="placeholder span9">
-			<#list cv.getContacts().getPhoneArray() as phone>
-				<dl><dt>Phone</dt><dd>(${phone.getType()!""}) ${phone.getStringValue()!""}</dd></dl>
-			</#list>
-			<#list cv.getContacts().getEmailArray() as email>
-				<dl><dt>Email</dt><dd>${email!""}</dd></dl>
-			</#list>
-			<#list cv.getContacts().getWebsiteArray() as website>
-				<dl><dt>Website</dt><dd>${website!""}</dd></dl>
-			</#list>
-		</div>
-	</section>
-
-	<section class="viewer row-fluid" id="viewer-works">
-		<header class="span3">
-			<h3>Works</h3>
-		</header>
-		<div class="placeholder span9">
+	<div class="row-fluid">
+		<section class="viewer span6">
+			<header><h3>Work experiences</h3></header>
 			<#list cv.getWorks().getWorkArray() as work>
-				<div class="viewer-work">
-					<@period period=work.period />
-					<dl><dt>employer</dt><dd>${work.employer}</dd></dl>
-					<dl><dt>position</dt><dd>${work.position}</dd></dl>
-					<dl><dt>activities</dt><dd>${work.activities}</dd></dl>
-					<dl><dt>sector</dt><dd>${work.sector}</dd></dl>
+			<div class="well clearfix">
+				<@period period=work.period />
+				<dl><dt>Employer</dt><dd>${work.employer}</dd></dl>
+				<dl><dt>Position</dt><dd>${work.position}</dd></dl>
+				<dl><dt>Activities</dt><dd>${work.activities}</dd></dl>
+				<dl><dt>Sector</dt><dd>${work.sector}</dd></dl>
+			</div>
 			</#list>
-		</div>
-	</section>
+		</section>
 
-	<section class="viewer row-fluid" id="viewer-educations">
-		<header class="span3">
-			<h3>Educations</h3>
-		</header>
-		<div class="placeholder span9">
-		<#list cv.getEducations().getEducationArray() as education>
-		<div class="viewer-work">
-			<@period period=education.period />
-			<dl><dt>organisation</dt><dd>${education.organisation}</dd></dl>
-			<dl><dt>description</dt><dd>${education.description}</dd></dl>
-		</#list>
-		</div>
-	</section>
-
-	<section class="viewer row-fluid" id="viewer-skills">
-		<header class="span3">
-			<h3>Skills</h3>
-		</header>
-		<div class="placeholder span9">
-		<#list cv.getSkills().getSkillArray() as skill>
-		<div class="viewer-work">
-			<dl><dt>${skill.getName()!""}</dt><dd>${skill.getStringValue()!""}</dd></dl>
-		</#list>
-		</div>
-	</section>
-
-	<section class="viewer row-fluid" id="viewer-languages">
-		<header class="span3">
-			<h3>Languages</h3>
-		</header>
-		<div class="placeholder span9">
-		<#list cv.getLanguages().getLanguageArray() as language>
-		<div class="viewer-work">
-			<dl><dt>${language.getLevel()!""}</dt><dd>${language.getStringValue()!""}</dd></dl>
-		</#list>
-		</div>
-	</section>
-
+		<section class="viewer span6">
+			<header><h3>Education</h3></header>
+			<#list cv.getEducations().getEducationArray() as education>
+			<div class="well clearfix">
+				<@period period=education.period />
+				<dl><dt>Organisation</dt><dd>${education.organisation!"-"}</dd></dl>
+				<dl><dt>Description</dt><dd>${education.description!"-"}</dd></dl>
+			</div>
+			</#list>
+		</section>
+	</div>
 </div>
 
 <#macro period period>
-	<dl><dt>Period</dt><dd>${period.from.year!""}/${period.from.month!""}/${period.from.day!""} to ${period.to.year!""}/${period.to.month!""}/${period.to.day!""}</dd></dl>
-</fieldset>
-
+	<dl><dt>Period</dt><dd>${period.from.year?c!""}/${period.from.month?c!""}/${period.from.day?c!""} to ${period.to.year?c!""}/${period.to.month?c!""}/${period.to.day?c!""}</dd></dl>
 </#macro>
-
 
 <#include "/layout/debug.ftl">
 <#include "/layout/footer.ftl">

@@ -3,13 +3,13 @@
 <#include "/layout/fieldsets.ftl">
 
 <div class="hide">
-	<div class="template" data-trigger="phone"><@fieldsetContactPhone type="" content="" /></div>
-	<div class="template" data-trigger="email"><@fieldsetContactEmail content=""/></div>
-	<div class="template" data-trigger="website"><@fieldsetContactWebsite content=""/></div>
-	<div class="template" data-trigger="work"><@fieldsetWork period="" employer="" position="" activities="" sector=""/></div>
-	<div class="template" data-trigger="education"><@fieldsetEducation period="" organisation="" description=""/></div>
-	<div class="template" data-trigger="skill"><@fieldsetSkill name="" content="" /></div>
-	<div class="template" data-trigger="language"><@fieldsetLanguage level="" content="" /></div>
+	<div class="template" data-trigger="phone"><@fieldsetContactPhone /></div>
+	<div class="template" data-trigger="email"><@fieldsetContactEmail /></div>
+	<div class="template" data-trigger="website"><@fieldsetContactWebsite /></div>
+	<div class="template" data-trigger="work"><@fieldsetWork /></div>
+	<div class="template" data-trigger="education"><@fieldsetEducation /></div>
+	<div class="template" data-trigger="skill"><@fieldsetSkill /></div>
+	<div class="template" data-trigger="language"><@fieldsetLanguage /></div>
 </div>
 
 <form method="POST" action="/editor/${cv.meta.hash}/">
@@ -68,7 +68,23 @@
 				<p><a class="btn btn-mini template-trigger-add" rel="email" href="#"><i class="icon icon-plus"></i> email</a></p>
 				<p><a class="btn btn-mini template-trigger-add" rel="website" href="#"><i class="icon icon-plus"></i> website</a></p>
 			</header>
-			<div class="placeholder span9"></div>
+			<div class="placeholder span9">
+				<#if cv.getContacts()??>
+					<#list cv.getContacts().getPhoneArray() as phone>
+						<@fieldsetContactPhone type=(phone.type) content=(phone.getStringValue()) />
+					</#list>
+				</#if>
+				<#if cv.getContacts()??>
+					<#list cv.getContacts().getEmailArray() as email>
+						<@fieldsetContactEmail content=(email) />
+					</#list>
+				</#if>
+				<#if cv.getContacts()??>
+					<#list cv.getContacts().getWebsiteArray() as website>
+						<@fieldsetContactWebsite content=(website) />
+					</#list>
+				</#if>
+			</div>
 		</section>
 
 
@@ -77,7 +93,13 @@
 				<h3>Works</h3>
 				<p><a class="btn btn-mini template-trigger-add" rel="work" href="#"><i class="icon icon-plus"></i> work</a></p>
 			</header>
-			<div class="placeholder span9"></div>
+			<div class="placeholder span9">
+				<#if cv.getWorks()??>
+					<#list cv.getWorks().getWorkArray() as work>
+						<@fieldsetWork period=(work.period) employer=(work.employer) position=(work.position) activities=(work.activities) sector=(work.sector) />
+					</#list>
+				</#if>
+			</div>
 		</section>
 
 		<section class="editor row-fluid" id="editor-educations">
@@ -85,7 +107,13 @@
 				<h3>Educations</h3>
 				<p><a class="btn btn-mini template-trigger-add" rel="education" href="#"><i class="icon icon-plus"></i> education</a></p>
 			</header>
-			<div class="placeholder span9"></div>
+			<div class="placeholder span9">
+				<#if cv.getEducations()??>
+					<#list cv.getEducations().getEducationArray() as education>
+						<@fieldsetEducation period=(education.period) organisation=(education.organisation) description=(education.description) />
+					</#list>
+				</#if>
+			</div>
 		</section>
 
 		<section class="editor row-fluid" id="editor-skills">
@@ -93,7 +121,13 @@
 				<h3>Skills</h3>
 				<p><a class="btn btn-mini template-trigger-add" rel="skill" href="#"><i class="icon icon-plus"></i> skill</a></p>
 			</header>
-			<div class="placeholder span9"></div>
+			<div class="placeholder span9">
+				<#if cv.getSkills()??>
+					<#list cv.getSkills().getSkillArray() as skill>
+						<@fieldsetSkill name=(skill.name) content=(skill.getStringValue()) />
+					</#list>
+				</#if>
+			</div>
 		</section>
 
 		<section class="editor row-fluid" id="editor-languages">
@@ -101,14 +135,27 @@
 				<h3>Languages</h3>
 				<p><a class="btn btn-mini template-trigger-add" rel="language" href="#"><i class="icon icon-plus"></i> language</a></p>
 			</header>
-			<div class="placeholder span9"></div>
+			<div class="placeholder span9">
+				<#if cv.getLanguages()??>
+					<#list cv.getLanguages().getLanguageArray() as language>
+						<@fieldsetLanguage level=(language.name) content=(language.getStringValue()) />
+					</#list>
+				</#if>
+			</div>
 		</section>
 
-		<div class="form-actions row-fluid form-inline">
+		<div class="form-actions row-fluid form-inline" style="text-align: right;">
 			<label class="radio"><input type="radio" name="meta-privacy" value="public" ${(cv.meta.privacy=="public")?string('checked', "")}>public</label>
 			<label class="radio"><input type="radio" name="meta-privacy" value="private" ${(cv.meta.privacy=="private")?string('checked', '')}>private</label>
-			<button class="btn">Cancel</button>
-			<button type="submit" class="btn btn-primary" style="width: 140px;">Save</button>
+			<#if !(cv.meta.created)??>
+				<button type="submit" class="btn btn-primary" style="width: 200px;">Create new CV</button>
+			<#else>
+				<#if urlKey == cv.meta.key>
+					<button type="submit" class="btn btn-primary" style="width: 200px;">Edit CV</button>
+				<#else>
+					<button type="submit" class="btn btn-danger disabled" style="width: 200px;">Forbidden, keys do not match</button>
+				</#if>
+			</#if>
 		</div>
 	</div>
 </form>

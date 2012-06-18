@@ -32,14 +32,16 @@
         <section id="homepage-activity" class="span7">
             <header><h2>Recently generated CVs</h2></header>
             <table class="table table-striped">
-                <thead><tr><th>#</th><th>Name</th><th>Preview</th></tr></thead>
+                <thead><tr><th>Name</th></tr></thead>
                 <tbody>
                 <#if (recentPublicCvs)??>
                     <#list recentPublicCvs as cvDoc>
-                        <tr><td>${(cvDoc.cv.meta.hash)!"No hash"}</td></tr>
+                        <tr>
+							<td><a href="/viewer/${cvDoc.cv.meta.hash}/">${cvDoc.cv.personal.firstName!"Unknown"} ${cvDoc.cv.personal.lastName!"Unknown"}</a></td>
+						</tr>
                     </#list>
                 <#else>
-                    <tr><td colspan="3">No data</td></tr>
+                    <tr><th></th>No data</td></tr>
                 </#if>
                 </tbody>
             </table>
@@ -54,7 +56,7 @@
                         <div class="control-group">
                             <label class="control-label" for="homepage-create-email">E-mail</label>
                             <div class="controls">
-								<div class="input-prepend"><span class="add-on">@</span><input type="text" id="homepage-create-email" name="email"></div>
+								<div class="input-prepend"><span class="add-on">@</span><input type="email" id="homepage-create-email" name="email"></div>
 								<p class="help-block"><strong>(Required)</strong> Can NOT be changed later.</p>
 							</div>
                         </div>
@@ -74,10 +76,11 @@
                 <header><h3>Looking for your already created CV?</h3></header>
                 <div class="well">
                     <p class="intro">Enter your e-mail. We will send you all of your CVs.</p>
-                    <form>
+                    <form action="/" method="GET">
+						<input type="hidden" name="do" value="forget" />
                         <div class="control-group">
                             <div class="controls">
-                                <div class="input-prepend input-append"><span class="add-on">@</span><input id="homepage-forget-email" type="text"><button class="btn" type="button">Go!</button>                                </div>
+                                <div class="input-prepend input-append"><span class="add-on">@</span><input name="email" id="homepage-forget-email" type="text"><button class="btn" type="submit">Go!</button>                                </div>
                             </div>
                         </div>
                     </form>

@@ -802,11 +802,20 @@ fieldset > .template-trigger-remove {
   padding: 0 20px;
   background: #FFF;
 }
+#viewer-controls {
+  text-align: right;
+}
 #homepage-create .btn {
   width: 100%;
 }
 .viewer dl dt {
   float: left;
   margin-right: 10px;
-  width: 140px;
+  width: 120px;
+}
+.viewer dl dd {
+  margin-left: 140px;
+}
+.viewer header {
+  margin-bottom: 20px;
 }

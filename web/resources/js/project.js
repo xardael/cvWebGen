@@ -14,4 +14,18 @@ $(function() {
         $fieldset.remove();
         event.preventDefault();
     });
+
+    $('#homepage-create .btn').on('click', function(event) {
+        var $trigger = $(this);
+        var $form = $trigger.closest('form');
+        var $input = $('#homepage-create-email');
+        var emailReg = /^([\w\-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+
+        if ($input.val() == "" || !emailReg.test($input.val())) {
+            alert("Enter valid e-mail address");
+            event.preventDefault();
+        }
+
+
+    });
 });

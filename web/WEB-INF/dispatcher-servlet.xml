@@ -42,4 +42,15 @@
         <property name="exposeSpringMacroHelpers" value="true"/>
     </bean>
 
+    <bean id="cvManager" class="cz.muni.fi.pb138.cvWebGen.CvManager" />
+
+    <bean id="latex" class="cz.muni.fi.pb138.cvWebGen.Latex">
+        <property name="storageDir" value="${storageDir}" />
+    </bean>
+
+    <bean id="configurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="WEB-INF/settings.properties" />
+    </bean>
+
+
 </beans>

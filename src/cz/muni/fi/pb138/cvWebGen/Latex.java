@@ -1,8 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.muni.fi.pb138.cvWebGen;
+
+import cz.muni.fi.pb138.cvWebGen.xml.CvDocument;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
 
 import java.io.*;
 import javax.xml.transform.Transformer;
@@ -15,34 +16,25 @@ import javax.xml.transform.stream.StreamSource;
  * @author pyty
  */
 public class Latex {
-    /**
-     * Perform transformation based on xml document
-     * 
-     * @param fileName
-     * @return path to the PDF
-     */
-    public static String generatePdf(String fileName, String xml) {
-        String baseDir = "/Volumes/Data/School/_Java/cvWebGenReborn/web/files";
-        String pathToSchema = "cv.xsl";
 
+    private static final Logger LOGGER = Logger.getLogger(Latex.class);
+    private String storageDir;
+
+    public void generatePdf(String fileName, CvDocument cvDocument) {
+
+        /* Write XML to file */
         try {
-            PrintWriter out = new PrintWriter(baseDir + "/xml/" + fileName + ".xml");
-            out.print(xml);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            cvDocument.save(new File(storageDir + fileName + ".xml"));
+        } catch (IOException e) {
+            LOGGER.log(Level.ERROR, "Error saving XML file needed to render TEX file", e);
         }
 
         TransformerFactory tFactory = TransformerFactory.newInstance();
         try {
-            Transformer transformer =
-                tFactory.newTransformer(new StreamSource(new File(pathToSchema)));
-
-            transformer.transform(new StreamSource(new File(baseDir + "/xml/" + fileName + ".xml")),
-                                  new StreamResult(new File(baseDir + "/latex/" + fileName + ".tex")));
-        
-        
-            Process p = Runtime.getRuntime().exec("pdflatex -output-directory=" + baseDir + "/pdf -interaction=batchmode " + baseDir + "/latex/" + fileName + ".tex");
+            Transformer transformer = tFactory.newTransformer(new StreamSource(new File(storageDir + "latex.xsl")));
+            transformer.transform(new StreamSource(new File(storageDir + fileName + ".xml")),
+                                  new StreamResult(new File(storageDir + fileName + ".tex")));
+            Process p = Runtime.getRuntime().exec("/usr/texbin/pdflatex -output-directory=" + storageDir + " -interaction=batchmode " + storageDir + fileName + ".tex");
             p.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line = reader.readLine();
@@ -50,9 +42,6 @@ public class Latex {
                 //System.out.println(line);
                 line = reader.readLine();
             }
-            
-            
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -60,7 +49,10 @@ public class Latex {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
-        return baseDir + "/pdf/" + fileName + ".pdf";
+    @Required
+    public void setStorageDir(String storageDir) {
+        this.storageDir = storageDir;
     }
 }
