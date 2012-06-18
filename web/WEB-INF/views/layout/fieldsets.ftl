@@ -1,62 +1,44 @@
-<#macro meta hash key email privacy created modified>
-	<div class="span6">
-		<table class="table table-condensed table-bordered">
+<#macro fieldsetMeta email hash created="" modified="">
+	<fieldset>
+		<table class="table table-condensed table-bordered table-striped">
 			<tbody>
 				<tr><th>Email</th><td>${email} <input type="hidden" name="meta-email" value="${email}" /></td></tr>
 				<tr><th>Hash</th><td>${hash} <input type="hidden" name="meta-hash" value="${hash}" /></td></tr>
-				<tr><th>Key</th><td>${key} <input type="hidden" name="meta-key" value="${key}" /></td></tr>
 				<tr><th>Created</th><td>${created}</td></tr>
 				<tr><th>Modified</th><td>${modified}</td></tr>
 			</tbody>
 		</table>
-	</div>
-	<fieldset class="span6">
-		<div class="control-group">
-			<label class="control-label">privacy</label>
-			<div class="controls">
-				<label class="radio"><input type="radio" name="meta-privacy" value="public" ${(privacy=="public")?string('checked', "")}>public</label>
-				<label class="radio"><input type="radio" name="meta-privacy" value="private" ${(privacy=="private")?string('checked', '')}>private</label>
-				<p class="help-block"></p>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">key</label>
-			<div class="controls">
-				<input type="text" name="key" value="${key!"You have to enter key to edit"}">
-				<p class="help-block"></p>
-			</div>
-		</div>
 	</fieldset>
 </#macro>
 
 
 <#macro fieldsetPersonal firstName middleName lastName dateofbirth gender nationality>
-	<fieldset>
+	<fieldset class="form-horizontal">
 		<div class="control-group">
 			<label class="control-label">firstName</label>
 			<div class="controls">
-				<input type="text" name="personal-firstName" value="${firstName}">
+				<input type="text" class="span6" name="personal-firstName" value="${firstName}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">middleName</label>
 			<div class="controls">
-				<input type="text" name="personal-middleName" value="${middleName}">
+				<input type="text" class="span6" name="personal-middleName" value="${middleName}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">lastName</label>
 			<div class="controls">
-				<input type="text" name="personal-lastName" value="${lastName}">
+				<input type="text" class="span6" name="personal-lastName" value="${lastName}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">dateofbirth</label>
 			<div class="controls">
-				<input type="date" name="personal-dateofbirth" value="${dateofbirth}"/>
+				<input type="date" class="span6" name="personal-dateofbirth" value="${dateofbirth}"/>
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -71,7 +53,7 @@
 		<div class="control-group">
 			<label class="control-label">nationality</label>
 			<div class="controls">
-				<input type="text" name="personal-nationality" value="${nationality}">
+				<input type="text" class="span6" name="personal-nationality" value="${nationality}">
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -80,39 +62,39 @@
 
 
 <#macro fieldsetAddress street city zip state description>
-	<fieldset>
+	<fieldset class="form-horizontal">
 		<div class="control-group">
 			<label class="control-label">street</label>
 			<div class="controls">
-				<input type="text" name="address-street" value="${street}">
+				<input type="text" class="span6" name="address-street" value="${street}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">city</label>
 			<div class="controls">
-				<input type="text" name="address-city" value="${city}">
+				<input type="text" class="span6" name="address-city" value="${city}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">zip</label>
 			<div class="controls">
-				<input type="text" name="address-zip" value="${zip}">
+				<input type="text" class="span6" name="address-zip" value="${zip}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">state</label>
 			<div class="controls">
-				<input type="text" name="address-state" value="${state}">
+				<input type="text" class="span6" name="address-state" value="${state}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">description</label>
 			<div class="controls">
-				<input type="text" name="address-description" value="${description}">
+				<input type="text" class="span6" name="address-description" value="${description}">
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -121,14 +103,14 @@
 
 
 <#macro fieldsetContactPhone type content>
-	<fieldset>
+	<fieldset class="form-horizontal">
 		<div class="control-group">
 			<label class="control-label"><i class="icon icon-minus-sign template-trigger-remove"></i> Phone</label>
 			<div class="controls">
 				<div class="input-prepend">
 					<span class="add-on">type</span><input type="text" name="contact-phone-type" value="${type}" style="width: 80px;">
 				</div>
-				<input type="text" name="contact-phone-content" value="${content}">
+				<input type="text" style="width: 48.9362%;" name="contact-phone-content" value="${content}">
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -136,11 +118,11 @@
 </#macro>
 
 <#macro fieldsetContactEmail content>
-	<fieldset>
+	<fieldset class="form-horizontal">
 		<div class="control-group">
 			<label class="control-label"><i class="icon icon-minus-sign template-trigger-remove"></i> Email</label>
 			<div class="controls">
-				<input type="text" name="contact-email-content" value="${content}">
+				<input type="text" class="span6" name="contact-email-content" value="${content}">
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -148,11 +130,11 @@
 </#macro>
 
 <#macro fieldsetContactWebsite content>
-	<fieldset>
+	<fieldset class="form-horizontal">
 		<div class="control-group">
 			<label class="control-label"><i class="icon icon-minus-sign template-trigger-remove"></i> Website</label>
 			<div class="controls">
-				<input type="text" name="contact-website-content" value="${content}">
+				<input type="text" class="span6" name="contact-website-content" value="${content}">
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -161,7 +143,7 @@
 
 
 <#macro fieldsetPeriod parent="" period="">
-	<fieldset>
+	<fieldset class="form-horizontal">
 		<div class="control-group">
 			<label class="control-label">period from</label>
 			<div class="controls">
@@ -185,34 +167,34 @@
 
 
 <#macro fieldsetWork period employer position activities sector>
-	<fieldset class="well">
+	<fieldset class="well form-horizontal">
 		<i class="icon icon-minus-sign template-trigger-remove"></i>
 		<@fieldsetPeriod parent="work" period=period />
 		<div class="control-group">
 			<label class="control-label">employer</label>
 			<div class="controls">
-				<input type="text" name="work-employer" value="${employer}">
+				<input type="text" class="span6" name="work-employer" value="${employer}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">position</label>
 			<div class="controls">
-				<input type="text" name="work-position" value="${position}">
+				<input type="text" class="span6" name="work-position" value="${position}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">activities</label>
 			<div class="controls">
-				<input type="text" name="work-activities" value="${activities}">
+				<textarea class="span12" name="work-activities">${activities}</textarea>
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">sector</label>
 			<div class="controls">
-				<input type="text" name="work-sector" value="${sector}">
+				<input type="text" class="span6" name="work-sector" value="${sector}">
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -221,20 +203,20 @@
 
 
 <#macro fieldsetEducation period organisation description>
-	<fieldset class="well">
+	<fieldset class="well form-horizontal">
 		<i class="icon icon-minus-sign template-trigger-remove"></i>
 		<@fieldsetPeriod parent="education" period=period />
 		<div class="control-group">
 			<label class="control-label">organisation</label>
 			<div class="controls">
-				<input type="text" name="education-organisation" value="${organisation}">
+				<input type="text" class="span6" name="education-organisation" value="${organisation}">
 				<p class="help-block"></p>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">description</label>
 			<div class="controls">
-				<input type="text" name="education-description" value="${description}">
+				<textarea class="span12" name="education-description">${description}</textarea>
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -242,14 +224,14 @@
 </#macro>
 
 <#macro fieldsetSkill name content>
-	<fieldset>
+	<fieldset class="form-horizontal">
 		<div class="control-group">
 			<div class="controls controls-wide">
 				<i class="icon icon-minus-sign template-trigger-remove"></i>
 				<div class="input-prepend">
 					<span class="add-on">name</span><input type="text" name="skill-name" value="${name}" style="width: 100px;">
 				</div>
-				<input type="text" name="skill-content" value="${content}">
+				<textarea class="span12" name="skill-content">${content}</textarea>
 				<p class="help-block"></p>
 			</div>
 		</div>
@@ -257,7 +239,7 @@
 </#macro>
 
 <#macro fieldsetLanguage level content>
-	<fieldset>
+	<fieldset class="form-horizontal">
 		<div class="control-group">
 			<div class="controls controls-wide">
 				<i class="icon icon-minus-sign template-trigger-remove"></i>
@@ -267,7 +249,7 @@
 					<option value="intermediate">intermediate</option>
 					<option value="advanced">advanced</option>
 				</select>
-				<input type="text" name="language-content" value="${content}">
+				<input type="text" style="width: 48.9362%;" name="language-content" value="${content}">
 				<p class="help-block"></p>
 			</div>
 		</div>

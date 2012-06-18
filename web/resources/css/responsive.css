@@ -788,6 +788,20 @@ fieldset > .template-trigger-remove {
   left: -20px;
   top: 5px;
 }
+.heading {
+  border-top: 1px solid #eeeeee;
+  text-align: center;
+  margin-top: 26px;
+}
+.heading h2 {
+  line-height: 1;
+  font-size: 28px;
+  display: inline;
+  position: relative;
+  top: -16px;
+  padding: 0 20px;
+  background: #FFF;
+}
 #homepage-create .btn {
   width: 100%;
 }

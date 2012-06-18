@@ -1,30 +1,38 @@
 package cz.muni.fi.pb138.cvWebGen;
 
 import cz.muni.fi.pb138.cvWebGen.xml.*;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlOptions;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CvManager {
 
+    private static final Logger LOGGER = Logger.getLogger(CvManager.class);
+    public static final String BASEX_DB_NAME = "JAVA_CVS";
     private BaseXClient baseXClient;
 
     public CvManager() {
         try {
             baseXClient = new BaseXClient("localhost", 1984, "admin", "admin");
+            baseXClient.execute("OPEN " + BASEX_DB_NAME);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public CvDocument parseFromHtmlFormRequest(HttpServletRequest request) {
+    public CvDocument parseFromForm(HttpServletRequest request) {
 
         /* Build document */
         CvDocument cvDocument = CvDocument.Factory.newInstance();
@@ -41,7 +49,18 @@ public class CvManager {
         } else {
             meta.setPrivacy(MetaType.Privacy.PUBLIC);
         }
-        meta.setCreated(Calendar.getInstance()); // TODO: Do not change when modify
+        if (request.getParameter("meta-created") != null && !request.getParameter("meta-created").isEmpty()) { // Submiting edit
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat();
+            try {
+                cal.setTime(sdf.parse(request.getParameter("meta-created")));
+            } catch (ParseException e) {
+                LOGGER.log(Level.ERROR, "parseFromForm: meta-created parsing from user form FAILED, input: " + request.getParameter("meta-created"));
+            }
+            meta.setCreated(cal);
+        } else { // Submiting new CV
+            meta.setCreated(Calendar.getInstance());
+        }
         meta.setModified(Calendar.getInstance());
 
 
@@ -72,7 +91,7 @@ public class CvManager {
             personal.setDateofbirth(cal);
         }
         /* gender */
-        if (request.getParameter("personal-gender").equals("male")) {
+        if (request.getParameter("personal-gender") != null && request.getParameter("personal-gender").equals("male")) {
             personal.setGender(PersonalType.Gender.MALE);
         } else {
             personal.setGender(PersonalType.Gender.FEMALE);
@@ -230,18 +249,43 @@ public class CvManager {
         return newPeriod;
     }
 
-    public CvDocument getCvDocumentByHash(String hash) {
+    public int countCvsByHash(String hash) {
+        LOGGER.log(Level.INFO, "countCvsByHash: start, param: " + hash);
+
+        int count = 0;
+        try {
+            BaseXClient.Query query = baseXClient.query(
+                    "for $cv in //cv " +
+                    "where $cv/meta/hash/text() = \"" + hash + "\" " +
+                    "return count($cv)"
+            );
+            String result = query.execute();
+            if (result.equals("")) {
+                count = 0;
+            } else {
+                count = Integer.parseInt(result);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        LOGGER.log(Level.INFO, "countCvsByHash: count result: " + count);
+        return count;
+    }
+
+    public CvDocument getByHash(String hash) {
+        LOGGER.log(Level.INFO, "getByHash: start, param: " + hash);
 
         CvDocument cvDocument = null;
         try {
-            baseXClient.execute("OPEN JAVA_CVS");
             BaseXClient.Query query = baseXClient.query(
                 "for $cv in //cv " +
                 "where $cv/meta/hash/text() = \"" + hash + "\" " +
                 "return $cv"
             );
             String result = query.execute();
-            result = result.replaceFirst("<cv>", "<cv xmlns=\"http://fi.muni.cz/pb138/cvWebGen/xml\">");
+            LOGGER.log(Level.INFO, "getByHash: query result: \n" + result);
+            result = result.replaceFirst("<cv>", "<cv xmlns=\"http://fi.muni.cz/pb138/cvWebGen/xml\">"); // HACK: Add namespace, must be trimmed before saving to DB
             cvDocument = CvDocument.Factory.parse(result);
         } catch (IOException e) {
             e.printStackTrace();
@@ -250,5 +294,78 @@ public class CvManager {
         }
 
         return cvDocument;
+    }
+
+    public CvDocument init(String email, String privacy) {
+
+        String hash = "";
+        String key = "";
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            String toHash = email + new Date().toString();
+            String toKey = email + new Date().toString() + (new Random().nextInt());
+            messageDigest.reset();
+            hash = new BigInteger(1, messageDigest.digest(toHash.getBytes(Charset.forName("UTF-8")))).toString();
+            messageDigest.reset();
+            key = new BigInteger(1, messageDigest.digest(toKey.getBytes(Charset.forName("UTF-8")))).toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        CvDocument cvDocument = CvDocument.Factory.newInstance();
+        CvDocument.Cv cv = cvDocument.addNewCv();
+        MetaType newMeta = cv.addNewMeta();
+        newMeta.setHash(hash);
+        newMeta.setKey(key);
+        newMeta.setEmail(email);
+        if(privacy.equals("private")) {newMeta.setPrivacy(MetaType.Privacy.PRIVATE);} else {newMeta.setPrivacy(MetaType.Privacy.PUBLIC);}
+
+        LOGGER.log(Level.INFO, "init: HASH: " + hash + " and KEY: " + key);
+
+        return cvDocument;
+    }
+
+    public CvDocument getPublic(int limit) {
+        CvDocument result = null;
+        try {
+            BaseXClient.Query query = baseXClient.query(
+              "for $cv in //cv " +
+              "where $cv/meta/privacy == \"public\" " +
+              "return $cv"
+            );
+            String execute = query.execute();
+            execute = execute.replaceAll("<cv>", "<cv xmlns=\"http://fi.muni.cz/pb138/cvWebGen/xml\">"); // HACK: Add namespace, must be trimmed before saving to DB
+            result = CvDocument.Factory.parse(execute);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (XmlException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public void persist(CvDocument cvDocument) {
+        LOGGER.log(Level.INFO, "Persisting CV with hash " + cvDocument.getCv().getMeta().getHash().toString());
+        try {
+            baseXClient.add(cvDocument.getCv().getMeta().getHash(), new ByteArrayInputStream(this.prettyXml(cvDocument).getBytes("UTF-8")));
+        } catch (IOException e) {
+            LOGGER.log(Level.ERROR, "Cannot persist");
+        }
+    }
+
+    public String prettyXml(CvDocument cvDocument) {
+        Map namespaceForwardMap = new HashMap<String, String>();
+        namespaceForwardMap.put("", "http://fi.muni.cz/pb138/cvWebGen/xml");
+        return cvDocument.xmlText((new XmlOptions()).setSavePrettyPrint().setUseDefaultNamespace().setSaveImplicitNamespaces(namespaceForwardMap));
+    }
+
+    public void unpersist(String hash) {
+        LOGGER.log(Level.INFO, "unpersist: Unpersisting CV with hash " + hash);
+        try {
+            baseXClient.execute("DELETE " + hash);
+        } catch (IOException e) {
+            LOGGER.log(Level.INFO, "unpersist: FAILED");
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }

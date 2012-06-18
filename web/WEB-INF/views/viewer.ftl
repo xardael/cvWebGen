@@ -2,9 +2,16 @@
 <#include "/layout/navigation.ftl">
 <div class="container">
 
+	<section class="row-fluid" id="viewer-controls">
+		<div class="span6">
+			<p><a class="btn" href="/editor/${cv.meta.hash}/">Edit CV</a></p>
+			<p>You need to know key to edit.</p>
+		</div>
+	</section>
+
 	<section class="viewer row-fluid" id="viewer-personal">
 		<header class="span3">
-			<h2>Personal</h2>
+			<h3>Personal</h3>
 		</header>
 		<div class="placeholder span9">
 			<dl><dt>firstName</dt><dd>${(cv.personal.firstName)!""}</dd></dl>
@@ -18,7 +25,7 @@
 
 	<section class="viewer row-fluid" id="viewer-address">
 		<header class="span3">
-			<h2>Address</h2>
+			<h3>Address</h3>
 		</header>
 		<div class="placeholder span9">
 			<dl><dt>street</dt><dd>${(cv.address.street)!""}</dd></dl>
@@ -31,7 +38,7 @@
 
 	<section class="viewer row-fluid" id="viewer-contacts">
 		<header class="span3">
-			<h2>Contacts</h2>
+			<h3>Contacts</h3>
 		</header>
 		<div class="placeholder span9">
 			<#list cv.getContacts().getPhoneArray() as phone>
@@ -48,7 +55,7 @@
 
 	<section class="viewer row-fluid" id="viewer-works">
 		<header class="span3">
-			<h2>Works</h2>
+			<h3>Works</h3>
 		</header>
 		<div class="placeholder span9">
 			<#list cv.getWorks().getWorkArray() as work>
@@ -64,7 +71,7 @@
 
 	<section class="viewer row-fluid" id="viewer-educations">
 		<header class="span3">
-			<h2>Educations</h2>
+			<h3>Educations</h3>
 		</header>
 		<div class="placeholder span9">
 		<#list cv.getEducations().getEducationArray() as education>
@@ -78,7 +85,7 @@
 
 	<section class="viewer row-fluid" id="viewer-skills">
 		<header class="span3">
-			<h2>Skills</h2>
+			<h3>Skills</h3>
 		</header>
 		<div class="placeholder span9">
 		<#list cv.getSkills().getSkillArray() as skill>
@@ -90,7 +97,7 @@
 
 	<section class="viewer row-fluid" id="viewer-languages">
 		<header class="span3">
-			<h2>Languages</h2>
+			<h3>Languages</h3>
 		</header>
 		<div class="placeholder span9">
 		<#list cv.getLanguages().getLanguageArray() as language>
