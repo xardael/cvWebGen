@@ -35,8 +35,8 @@
                 <thead><tr><th>#</th><th>Name</th><th>Preview</th></tr></thead>
                 <tbody>
                 <#if (recentPublicCvs)??>
-                    <#list recentCvs as cv>
-                        <tr><td>${cv.id}</td><td>${cv.user}</td><td>${cv.preview}</td></tr>
+                    <#list recentPublicCvs as cvDoc>
+                        <tr><td>${(cvDoc.cv.meta.hash)!"No hash"}</td></tr>
                     </#list>
                 <#else>
                     <tr><td colspan="3">No data</td></tr>
@@ -49,25 +49,20 @@
                 <header><h2>Create CV</h2></header>
                 <div class="well">
                     <p class="intro">Creating CV is <strong>very easy and intuitive</strong>, fast, doesn't require no kind of registration and your data will be safe.</p>
-                    <form class="form-horizontal">
-                        <div class="control-group">
-                            <label class="control-label" for="homepage-create-name">Name</label>
-                            <div class="controls"><input type="text" id="homepage-create-name"></div>
-                        </div>
+                    <form class="form-vertical" action="/editor/create/" METHOD="POST">
+						<input type="hidden" name="do" value="create" />
                         <div class="control-group">
                             <label class="control-label" for="homepage-create-email">E-mail</label>
-                            <div class="controls"><div class="input-prepend"><span class="add-on">@</span><input type="text" id="homepage-create-email"></div><p class="help-block">(Required) Can NOT be changed later. Used for access to your CV.</p></div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Privacy</label>
                             <div class="controls">
-                                <label class="radio"><dl><dt><input type="radio" name="homepage-create-privacy" value="public" checked="">Public</dt><dd>Anyone can search for and view</dd></dl></label>
-                                <label class="radio"><dl><dt><input type="radio" name="homepage-create-privacy" value="unlisted" checked="">Unlisted</dt><dd>Just who you decide to share.</dd></dl></label>
-                            </div>
+								<div class="input-prepend"><span class="add-on">@</span><input type="text" id="homepage-create-email" name="email"></div>
+								<p class="help-block"><strong>(Required)</strong> Can NOT be changed later.</p>
+							</div>
                         </div>
                         <div class="control-group">
-                            <label class="control-label"></label>
-                            <div class="controls"><label class="checkbox"><input type="checkbox" name="homepage-create-agreement" value="agree">I agree with <a href="#TODO" title="Read full terms on GitHub">terms</a>.</label></div>
+                            <div class="controls">
+                                <label class="radio"><dl><dt><input type="radio" name="privacy" value="public" checked="checked">Public</dt><dd>Anyone can search for and view</dd></dl></label>
+                                <label class="radio"><dl><dt><input type="radio" name="privacy" value="private">Private</dt><dd>Just who you decide to share.</dd></dl></label>
+                            </div>
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">Create CV</button>

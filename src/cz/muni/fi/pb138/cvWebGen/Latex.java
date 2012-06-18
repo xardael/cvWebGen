@@ -4,10 +4,7 @@
  */
 package cz.muni.fi.pb138.cvWebGen;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -18,28 +15,34 @@ import javax.xml.transform.stream.StreamSource;
  * @author pyty
  */
 public class Latex {
-
     /**
      * Perform transformation based on xml document
      * 
-     * @param userName
+     * @param fileName
      * @return path to the PDF
      */
-    public String generatePdf(String userName) {
-        String baseDir = "/home/pyty/mzj/projects/Latex2/files";
+    public static String generatePdf(String fileName, String xml) {
+        String baseDir = "/Volumes/Data/School/_Java/cvWebGenReborn/web/files";
         String pathToSchema = "cv.xsl";
-        
-           
+
+        try {
+            PrintWriter out = new PrintWriter(baseDir + "/xml/" + fileName + ".xml");
+            out.print(xml);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
         TransformerFactory tFactory = TransformerFactory.newInstance();
         try {
             Transformer transformer =
                 tFactory.newTransformer(new StreamSource(new File(pathToSchema)));
 
-            transformer.transform(new StreamSource(new File(baseDir + "/xml/" + userName + ".xml")),
-                                  new StreamResult(new File(baseDir + "/latex/" + userName + ".tex")));
+            transformer.transform(new StreamSource(new File(baseDir + "/xml/" + fileName + ".xml")),
+                                  new StreamResult(new File(baseDir + "/latex/" + fileName + ".tex")));
         
         
-            Process p = Runtime.getRuntime().exec("pdflatex -output-directory=" + baseDir + "/pdf -interaction=batchmode " + baseDir + "/latex/" + userName + ".tex");
+            Process p = Runtime.getRuntime().exec("pdflatex -output-directory=" + baseDir + "/pdf -interaction=batchmode " + baseDir + "/latex/" + fileName + ".tex");
             p.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line = reader.readLine();
@@ -58,6 +61,6 @@ public class Latex {
             e.printStackTrace();
         }
 
-        return baseDir + "/pdf/" + userName + ".pdf";
+        return baseDir + "/pdf/" + fileName + ".pdf";
     }
 }

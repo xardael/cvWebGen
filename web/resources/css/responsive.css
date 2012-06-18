@@ -754,6 +754,17 @@
 .form-horizontal .control-label {
   text-align: left;
 }
+dl {
+  margin: 0 !important;
+  float: none;
+  clear: left;
+}
+form {
+  margin: 0px !important;
+}
+.form-actions {
+  margin-bottom: 0px !important;
+}
 section.editor {
   padding-top: 17px;
   margin: 18px 0;
@@ -767,4 +778,35 @@ fieldset > .template-trigger-remove {
   position: absolute;
   left: -20px;
   top: 5px;
+}
+.controls.controls-wide {
+  position: relative;
+  margin-left: 0px;
+}
+.controls.controls-wide > .template-trigger-remove {
+  position: absolute;
+  left: -20px;
+  top: 5px;
+}
+.heading {
+  border-top: 1px solid #eeeeee;
+  text-align: center;
+  margin-top: 26px;
+}
+.heading h2 {
+  line-height: 1;
+  font-size: 28px;
+  display: inline;
+  position: relative;
+  top: -16px;
+  padding: 0 20px;
+  background: #FFF;
+}
+#homepage-create .btn {
+  width: 100%;
+}
+.viewer dl dt {
+  float: left;
+  margin-right: 10px;
+  width: 140px;
 }
