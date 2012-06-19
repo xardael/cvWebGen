@@ -1,67 +1,75 @@
-import org.basex.core.*;
+import cz.muni.fi.pb138.cvWebGen.BaseXClient;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateIndex;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.DropIndex;
-import org.basex.core.cmd.InfoDB;
-import org.basex.core.cmd.List;
-import org.basex.core.cmd.Open;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+
+import static junit.framework.Assert.*;
 
 public final class CreateDbAndExecuteBasicXQuery {
 
-    /**
-     * Runs the example code.
-     * @param args (ignored) command-line arguments
-     * @throws BaseXException if a database command fails
-     */
-    public static void main(final String[] args) throws BaseXException {
-        /** Database context. */
-        Context context = new Context();
+    private BaseXClient baseXClient;
+    private String projectDir = "/Volumes/Data/School/_Java/cvWebGenReborn/";
 
-        System.out.println("=== CreateDbAndExecuteBasicXQuery ===");
+    @Before
+    public void setUp() throws Exception {
 
-        System.out.println("\n ## Create a database.");
-        new CreateDB("Nedele", "assets/xml/anna.xml").execute(context);
+        try {
+            baseXClient = new BaseXClient("localhost", 1984, "admin", "admin");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        System.out.println("\n ## Show existing databases: (should contain XmlDbExample)");
-        System.out.print(new List().execute(context));
-
-        System.out.println("\n ## Close and reopen database.");
-        new Close().execute(context);
-        new Open("Nedele").execute(context);
-
-        System.out.println("\n ## Create a full-text index.");
-        new CreateIndex("fulltext").execute(context); // Additionally create a full-text index
-
-        System.out.println("\n ## Show database information:");
-        System.out.print(new InfoDB().execute(context));
-
-        System.out.println("\n ## Test basic XQuery:");
-        System.out.println( "Name: " + new XQuery("/cv/personal/firstName/text()").execute(context) + " " + new XQuery("/cv/personal/lastName/text()").execute(context));
-
-        System.out.println("\n ## Test advanced XQuery:");
-        System.out.println( "Works: " + new XQuery(
-                "for $x in //cv/works/work " +
-                "order by $x/employer " +
-                "return $x/position/text() || \" at \" || $x/employer/text() || \", \""
-        ).execute(context));
-
-
-        System.out.println("\n ## Drop indexes.");
-        new DropIndex("text").execute(context);
-        new DropIndex("attribute").execute(context);
-        new DropIndex("fulltext").execute(context);
-
-        System.out.println("\n ## Drop the database.");
-        // new DropDB("XmlDbExample").execute(context); // Drop the database
-
-        System.out.println("\n ## Show existing databases:  (should NOT contain XmlDbExample)"); // Show all existing databases
-        System.out.print(new List().execute(context));
-
-        context.close(); // Close the database context
     }
 
+    @Test
+    public void testCreateSampleDbAndExecuteBasicXQuery() throws Exception {
+
+        String dbName = "testCreateSampleDbAndExecuteBasicXQuery";
+
+        System.out.println("=== testCreateSampleDbAndExecuteBasicXQuery ===");
+
+        System.out.println("\n ## Create a database.");
+        System.out.println(baseXClient.execute("CREATE DATABASE " + dbName + " " + projectDir + "tests/anna.xml"));
+
+        System.out.println("\n ## Show existing databases:");
+        assertTrue(baseXClient.execute("LIST").indexOf(dbName) > 0);
+        System.out.println(baseXClient.execute("LIST"));
+
+        System.out.println("\n ## Close and reopen database.");
+        baseXClient.execute("CLOSE");
+        baseXClient.execute("OPEN " + dbName);
+
+        System.out.println("\n ## Create a full-text index.");
+        baseXClient.execute("CREATE INDEX FULLTEXT");
+
+        System.out.println("\n ## Test basic XQuery:");
+        System.out.println( "Name: " + baseXClient.query("/cv/personal/firstName/text()").execute() + " " + baseXClient.query("/cv/personal/lastName/text()").execute());
+        assertEquals("Anna Cermakova", baseXClient.query("/cv/personal/firstName/text()").execute() + " " + baseXClient.query("/cv/personal/lastName/text()").execute());
+
+        System.out.println("\n ## Test advanced XQuery:");
+        System.out.println( "Works: " + baseXClient.query(
+                "for $x in //cv/works/work " +
+                        "order by $x/employer " +
+                        "return $x/position/text() || \" at \" || $x/employer/text() || \", \""
+        ).execute());
+
+
+        System.out.println("\n ## Drop the database.");
+        System.out.println(baseXClient.execute("DROP DATABASE " + dbName));; // Drop the database
+
+        System.out.println("\n ## Show existing databases:"); // Show all existing databases
+        System.out.println(baseXClient.execute("LIST"));
+        assertTrue(baseXClient.execute("LIST").indexOf(dbName) == -1);
+
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        baseXClient.close();
+    }
 }

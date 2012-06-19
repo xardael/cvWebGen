@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -76,23 +78,68 @@ public class DefaultController {
 
         CvDocument cvDocument = cvManager.parseFromForm(request);
 
+        /* Validate */
+        /* ******** */
+        // Set up the validation error listener.
+        ArrayList validationErrors = new ArrayList();
+        XmlOptions validationOptions = new XmlOptions();
+        validationOptions.setErrorListener(validationErrors);
+        CvDocument cvDocumentToValidate = (CvDocument) cvDocument.copy();
+        boolean isValid = cvDocumentToValidate.validate(validationOptions);
+        if (!isValid) {
+            Iterator iter = validationErrors.iterator();
+            while (iter.hasNext()) {
+                LOGGER.log(Level.INFO, ">> " + iter.next());
+            }
+            System.out.println("*** RAW XML WHEN XML VALIDATION ERROR ***");
+            System.out.println(cvDocumentToValidate.xmlText());
+            System.out.println("******");
+        }
+
         if (request.getParameter("meta-key") != null && !request.getParameter("meta-key").isEmpty()) {
             // Create new CV
+            LOGGER.log(Level.INFO, "editorSave: Creating new");
+            if (!isValid) {
+                LOGGER.log(Level.INFO, "editorSave: Creating new, not valid");
+                model.addAttribute("validator", "error");
+                cvDocument.getCv().getMeta().setCreated(null);
+                cvDocument.getCv().getMeta().setModified(null);
+                model.addAttribute("cv", cvDocument.getCv());
+                model.addAttribute("urlKey", cvDocument.getCv().getMeta().getKey());
+                model.addAttribute("xml", cvManager.prettyXml(cvDocument));
+                return "editor";
+            }
+
             if (cvManager.countCvsByHash(hash) > 0) {
-                LOGGER.log(Level.INFO, "editorSave: create new CV:  Already exists CV with same hash");
+                LOGGER.log(Level.INFO, "editorSave: Creating new, Duplicate Hash");
                 model.addAttribute("status", "error-duplicateHash");
             } else {
-                LOGGER.log(Level.INFO, "editorSave: create: Everything seems OK, going to persist CV.");
+                LOGGER.log(Level.INFO, "editorSave: Creating new, OK - going to persist");
                 cvManager.persist(cvDocument);
                 sentMailToOwner(cvDocument);
                 model.addAttribute("status", "ok");
             }
         } else if (request.getParameter("urlKey") != null && !request.getParameter("urlKey").isEmpty()) {
             // Edit existing CV
+            LOGGER.log(Level.INFO, "editorSave: Editing existing");
             String urlKey = request.getParameter("urlKey");
             CvDocument.Cv currentCv = cvManager.getByHash(hash).getCv();
             String currentKey = currentCv.getMeta().getKey();
+
+            if (!isValid) {
+                LOGGER.log(Level.INFO, "editorSave: Editing existing, not valid");
+                model.addAttribute("validator", "error");
+                cvDocument.getCv().getMeta().setKey(urlKey); // Do not change key
+                cvDocument.getCv().getMeta().xsetCreated(currentCv.getMeta().xgetCreated()); // Do not change created
+                cvDocument.getCv().getMeta().xsetModified(currentCv.getMeta().xgetModified());
+                model.addAttribute("cv", cvDocument.getCv());
+                model.addAttribute("urlKey", urlKey);
+                model.addAttribute("xml", cvManager.prettyXml(cvDocument));
+                return "editor";
+            }
+
             if (urlKey.equals(currentKey)) {
+                LOGGER.log(Level.INFO, "editorSave: Editing existing, Keys matches");
                 if (cvManager.countCvsByHash(hash) == 1) {
                     LOGGER.log(Level.INFO, "editorSave: edit: Found CV with given hash, going to delete and persist new.");
                     cvManager.unpersist(hash);

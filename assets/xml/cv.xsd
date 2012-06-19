@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://fi.muni.cz/pb138/cvWebGen/xml" xmlns="http://fi.muni.cz/pb138/cvWebGen/xml">
     <xs:element name="cv">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="meta" type="metaType"/>
                 <xs:element name="personal" type="personalType"/>
                 <xs:element name="address" type="addressType"/>
-                <xs:element name="contacts">
+                <xs:element name="contacts" minOccurs="0">
                     <xs:complexType>
-                        <xs:choice minOccurs="1" maxOccurs="unbounded">
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
                             <xs:element name="phone">
                                 <xs:complexType>
                                     <xs:simpleContent>
@@ -18,33 +18,33 @@
                                     </xs:simpleContent>
                                 </xs:complexType>
                             </xs:element>
-                            <xs:element name="email" type="emailType"/>
+                            <xs:element name="email" type="xs:string"/>
                             <xs:element name="website" type="xs:anyURI"/>
                         </xs:choice>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="works">
+                <xs:element name="works" minOccurs="0">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="work" type="workType" minOccurs="0" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="educations">
+                <xs:element name="educations" minOccurs="0">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="education" type="educationType" minOccurs="0" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="skills">
+                <xs:element name="skills" minOccurs="0">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="skill" type="skillType" minOccurs="0" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="languages">
+                <xs:element name="languages" minOccurs="0">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="language" type="languageType" minOccurs="0" maxOccurs="unbounded"/>
@@ -60,7 +60,7 @@
         <xs:sequence>
             <xs:element name="hash" type="xs:string" />
             <xs:element name="key" type="xs:string" />
-            <xs:element name="email" type="emailType"/>
+            <xs:element name="email" type="xs:string" />
             <xs:element name="privacy">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
@@ -179,11 +179,5 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
-
-    <xs:simpleType name="emailType">
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[^@]+@[^\.]+\..+"/>
-        </xs:restriction>
-    </xs:simpleType>
 
 </xs:schema>

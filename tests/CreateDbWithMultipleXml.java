@@ -1,43 +1,72 @@
+import cz.muni.fi.pb138.cvWebGen.BaseXClient;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+
+import static junit.framework.Assert.assertTrue;
 
 public final class CreateDbWithMultipleXml {
 
-    public static void main(final String[] args) throws BaseXException {
+    private BaseXClient baseXClient;
+    private String projectDir = "/Volumes/Data/School/_Java/cvWebGenReborn/";
 
-        /** Database context. */
-        Context context = new Context();
+    @Before
+    public void setUp() throws Exception {
+
+        try {
+            baseXClient = new BaseXClient("localhost", 1984, "admin", "admin");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void testCreateDbWithMultipleXml() throws Exception {
+
+        String dbName = "testCreateSampleDbAndExecuteBasicXQuery";
 
         System.out.println("=== CreateDbWithMultipleXml ===");
 
         System.out.println("\n ## Create a database.");
-        new CreateDB("XmlCollection").execute(context);
-        new Add("", "src/test/sample-anna.xml").execute(context);
-        new Add("", "src/test/sample-bara.xml").execute(context);
-        new Add("", "src/test/sample-carlos.xml").execute(context);
-        new Optimize().execute(context);
+        System.out.println(baseXClient.execute("CREATE DATABASE " + dbName));
+        System.out.println(baseXClient.execute("ADD " + projectDir + "tests/anna.xml"));
+        System.out.println(baseXClient.execute("ADD " + projectDir + "tests/bara.xml"));
+        System.out.println(baseXClient.execute("ADD " + projectDir + "tests/carlos.xml"));
+        System.out.println(baseXClient.execute("OPTIMIZE"));
+        System.out.println(baseXClient.execute("LIST"));
+        assertTrue(baseXClient.execute("LIST").indexOf(dbName) > 0);
 
         System.out.println("\n ## Show database documents:");
-        System.out.println(new XQuery(
-                "for $doc in collection('XmlCollection')" +
-                "return <document path='{ base-uri($doc) }'/>"
-        ).execute(context));
-
-
-        System.out.println("\n ## Delete Carlos:");
-        new Delete("sample-carlos.xml").execute(context);
-
-        System.out.println("\n ## Show database documents: (should NOT contain Carlos)");
-        System.out.println(new XQuery(
-                "for $doc in collection('XmlCollection')" +
+        String query = baseXClient.query(
+                "for $doc in collection('" + dbName + "')" +
                         "return <document path='{ base-uri($doc) }'/>"
-        ).execute(context));
+        ).execute();
+        System.out.println(query);
+        assertTrue(query.indexOf("anna.xml") > 0);
+        assertTrue(query.indexOf("bara.xml") > 0);
+        assertTrue(query.indexOf("carlos.xml") > 0);
 
-        System.out.println("\n ## Drop the database.");
-        new DropDB("XmlCollection").execute(context); // Drop the database
+        System.out.println("## Deleting carlos");
+        baseXClient.execute("DELETE carlos.xml");
+        query = baseXClient.query(
+                "for $doc in collection('" + dbName + "')" +
+                        "return <document path='{ base-uri($doc) }'/>"
+        ).execute();
+        System.out.println(query);
+        assertTrue(query.indexOf("carlos.xml") == -1);
 
-        context.close(); // Close the database context
+        baseXClient.execute("DROP DATABASE " + dbName);
     }
 
+
+    @After
+    public void tearDown() throws Exception {
+        baseXClient.close();
+    }
 }

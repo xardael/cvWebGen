@@ -765,6 +765,12 @@ form {
 .form-actions {
   margin-bottom: 0px !important;
 }
+.navbar .slogan {
+  line-height: 40px;
+}
+.github {
+  float: right;
+}
 section.editor {
   padding-top: 17px;
   margin: 18px 0;

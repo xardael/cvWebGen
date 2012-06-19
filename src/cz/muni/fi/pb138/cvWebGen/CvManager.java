@@ -53,7 +53,11 @@ public class CvManager {
         /********/
         MetaType meta = cv.addNewMeta();
         meta.setHash(request.getParameter("meta-hash"));
-        meta.setKey(request.getParameter("meta-key"));
+        if (request.getParameter("meta-key") != null) { // Create new
+            meta.setKey(request.getParameter("meta-key"));
+        } else { // Editing existing
+            meta.setKey("to be replaced by script");
+        }
         meta.setEmail(request.getParameter("meta-email"));
         if (request.getParameter("meta-privacy").equals("private")) {
             meta.setPrivacy(MetaType.Privacy.PRIVATE);
@@ -295,7 +299,6 @@ public class CvManager {
                 "return $cv"
             );
             String result = query.execute();
-            LOGGER.log(Level.INFO, "getByHash: query result: \n" + result);
             result = result.replaceFirst("<cv>", "<cv xmlns=\"http://fi.muni.cz/pb138/cvWebGen/xml\">"); // HACK: Add namespace, must be trimmed before saving to DB
             cvDocument = CvDocument.Factory.parse(result);
         } catch (IOException e) {

@@ -79,7 +79,12 @@
 </div>
 
 <#macro period period>
-	<dl><dt>Period</dt><dd>${period.from.year?c!""}/${period.from.month?c!""}/${period.from.day?c!""} to ${period.to.year?c!""}/${period.to.month?c!""}/${period.to.day?c!""}</dd></dl>
+	<dl><dt>Period</dt>
+		<dd>
+			<#if (period.from.year > 0)>${period.from.year?c}</#if><#if (period.from.month > 0)>/${period.from.month?c}</#if><#if (period.from.day > 0)>/${period.from.day?c}</#if>
+			to
+			<#if (period.to.year > 0)>${period.to.year?c}</#if><#if (period.to.month > 0)>/${period.to.month?c}</#if><#if (period.to.day > 0)>/${period.to.day?c}</#if>
+		</dd></dl>
 </#macro>
 
 <#include "/layout/debug.ftl">

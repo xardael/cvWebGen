@@ -4,29 +4,28 @@
 <#include "/layout/navigation.ftl">
 <div class="container">
 
-    <section id="homepage-intro" class="hero-unit">
-        <h1>Create, manage, export&nbsp;&&nbsp;print CVs.</h1>
-        <p>Online CV maker, manager and exporter. Created as project for FI MUNI, PV138.</p>
-    </section>
+	<div class="heading"><h2>Create, manage, export&nbsp;&&nbsp;print CVs.</h2></div>
 
     <section id="homepage-features" class="row">
         <div class="span3">
-            <h4>Open-source</h4>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tellus nulla, accumsan vitae congue dapibus, blandit fermentum nulla. Pellentesque tincidunt congue urna nec eleifend.</p>
+            <h4>Java</h4>
+            <p>CvWebGen is written entirely in Java. It is based on Spring Framework, uses XmlBeans for XML-Java objects mapping, Log4J for logging, Java Mail for e-mail (via GMail smtp), JUnit for unit testing and Freemarker in View tier.</p>
         </div>
         <div class="span3">
-            <h4>Java & BaseX & XML</h4>
-            <p>Aliquam erat volutpat. Maecenas suscipit, dolor quis tristique interdum, velit purus aliquam ipsum, sit amet auctor nulla leo vel leo. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.</p>
+            <h4>BaseX</h4>
+            <p>For Persistence tier is used native XML database BaseX. It runs as standalone server and communicate with application via BaseX Java Client library. BaseX support full XQuery 3.0 for accessing data.</p>
         </div>
         <div class="span3">
-            <h4>Privacy</h4>
-            <p>Sed vel libero eu turpis fringilla ornare sit amet quis arcu. In adipiscing molestie lorem vel egestas. Aliquam lobortis velit sit amet orci eleifend porttitor. Maecenas elementum sem at ante gravida facilisis.</p>
-        </div>
-        <div class="span3">
-            <h4>Export <span class="label label-info">LaTeX</span></h4>
-            <p>Proin ut sem et arcu hendrerit placerat. Ut luctus faucibus commodo. Etiam dignissim lacus quis odio pellentesque dictum. Integer ac risus mi, sit amet volutpat nisl. Cras volutpat consequat odio, semper rhoncus urna ultrices vel.</p>
-        </div>
-    </section>
+			<h4>Export <span class="label label-info">LaTeX</span></h4>
+			<p>Exporting CVs to PDF is done by XSL Transformation to .tex and then rendering PDF via pdflatex. Standart Europe Curriculum Vitae format (eurocv) is used to maintain standardized look.</p>
+		</div>
+		<div class="span3">
+			<h4>School project</h4>
+			<p>CVWebGen was made as Final project for PB138 Modern Markup Languages and Their Applications at Masaryk University, Faculty of Informatics. It is completely open source and can be used for learning purposes.</p>
+		</div>
+	</section>
+
+	<hr />
 
     <div class="row">
         <section id="homepage-activity" class="span7">

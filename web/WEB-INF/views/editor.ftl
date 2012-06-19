@@ -24,7 +24,7 @@
 				<input type="hidden" name="meta-key" value="${cv.meta.key}" />
 			<#else>
 				<div class="heading"><h2>Editing existing CV</h2></div>
-				<#if urlKey == cv.meta.key>
+				<#if (urlKey == cv.meta.key)>
 					<div class="alert alert-info alert-block">
 						<h4 class="alert-heading">You are authenticated to edit this CV.</h4>
 						<p>Key in URL matches key saved in database.</p>
@@ -36,6 +36,13 @@
 						<p>Key in URL DOES NOT match key saved in database.</p>
 					</div>
 				</#if>
+			</#if>
+
+			<#if validator??>
+				<div class="alert alert-error alert-block">
+					<h4 class="alert-heading">CV NOT VALID</h4>
+					<p>Entered CV is not valid.</p>
+				</div>
 			</#if>
 		</section>
 
@@ -157,6 +164,14 @@
 				</#if>
 			</#if>
 		</div>
+
+		<#if validator??>
+			<section id="editor-xml">
+				<header><h3>XML Preview</h3></header>
+				<pre>${xml?xml}</pre>
+			</section>
+		</#if>
+
 	</div>
 </form>
 <#include "/layout/debug.ftl">

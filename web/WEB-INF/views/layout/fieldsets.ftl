@@ -14,7 +14,7 @@
 
 <#macro fieldsetPersonal firstName="" middleName="" lastName="" dateofbirth="" gender="" nationality="">
 	<fieldset class="form-horizontal">
-		<div class="control-group">
+		<div class="control-group error">
 			<label class="control-label">First name</label>
 			<div class="controls">
 				<input type="text" class="span6" name="personal-firstName" value="${firstName}">
@@ -28,21 +28,21 @@
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group error">
 			<label class="control-label">Last name</label>
 			<div class="controls">
 				<input type="text" class="span6" name="personal-lastName" value="${lastName}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group error">
 			<label class="control-label">Birth</label>
 			<div class="controls">
 				<input type="date" class="span6" name="personal-dateofbirth" value="${dateofbirth}"/>
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group error">
 			<label class="control-label">Gender</label>
 			<div class="controls">
 				<label class="radio"><input type="radio" name="personal-gender" value="male" ${(gender=="male")?string('checked', '')}>Male</label>
@@ -50,7 +50,7 @@
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group error">
 			<label class="control-label">Nationality</label>
 			<div class="controls">
 				<input type="text" class="span6" name="personal-nationality" value="${nationality}">
@@ -63,28 +63,28 @@
 
 <#macro fieldsetAddress street="" city="" zip="" state="" description="">
 	<fieldset class="form-horizontal">
-		<div class="control-group">
+		<div class="control-group error">
 			<label class="control-label">Street</label>
 			<div class="controls">
 				<input type="text" class="span6" name="address-street" value="${street}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group error">
 			<label class="control-label">City</label>
 			<div class="controls">
 				<input type="text" class="span6" name="address-city" value="${city}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group error">
 			<label class="control-label">Zip</label>
 			<div class="controls">
 				<input type="text" class="span6" name="address-zip" value="${zip}">
 				<p class="help-block"></p>
 			</div>
 		</div>
-		<div class="control-group">
+		<div class="control-group error">
 			<label class="control-label">State</label>
 			<div class="controls">
 				<input type="text" class="span6" name="address-state" value="${state}">
